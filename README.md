@@ -1,4 +1,5 @@
 ## 프로젝트
+콘서트 예약 서비스
 
 ## Getting Started
 
@@ -11,3 +12,8 @@
 ```bash
 docker-compose up -d
 ```
+
+### Docs
+- [API 명세서](./docs/api-spec.md)
+- [ERD](./docs/erd.md)
+- [인프라 구성도](./docs/infra.md)
