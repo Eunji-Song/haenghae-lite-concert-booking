@@ -2,7 +2,7 @@ package kr.hhplus.be.server.api.layered.entity.wallet;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import kr.hhplus.be.server.api.layered.entity.user.UsersEntity;
+import kr.hhplus.be.server.api.layered.entity.user.UserEntity;
 import kr.hhplus.be.server.common.jpa.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,7 +20,7 @@ public class WalletAccountEntity extends BaseEntity {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
-    private UsersEntity users;
+    private UserEntity users;
 
     @NotNull
     @Column(name = "balance", nullable = false)

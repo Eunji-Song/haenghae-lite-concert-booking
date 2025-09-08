@@ -29,7 +29,7 @@ public class UserTokenEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
     @Comment("USER")
-    private UsersEntity user;
+    private UserEntity user;
 
     @Size(max = 255)
     @NotNull

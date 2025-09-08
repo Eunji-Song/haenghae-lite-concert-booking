@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import kr.hhplus.be.server.api.clean.infrastructure.persistence.jpa.payment.PaymentEntity;
-import kr.hhplus.be.server.api.layered.entity.user.UsersEntity;
+import kr.hhplus.be.server.api.layered.entity.user.UserEntity;
 import kr.hhplus.be.server.common.enums.WalletTransactionType;
 import kr.hhplus.be.server.common.jpa.BaseEntity;
 import lombok.AccessLevel;
@@ -23,7 +23,7 @@ public class WalletTransactionEntity extends BaseEntity {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
-    private UsersEntity user;
+    private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "related_payment_id")

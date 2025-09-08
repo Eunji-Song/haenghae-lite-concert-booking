@@ -4,14 +4,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import kr.hhplus.be.server.api.layered.entity.concert.ConcertEntity;
-import kr.hhplus.be.server.api.layered.entity.user.UsersEntity;
+import kr.hhplus.be.server.api.layered.entity.user.UserEntity;
 import kr.hhplus.be.server.common.enums.QueueStatus;
 import kr.hhplus.be.server.common.jpa.BaseEntity;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 
 @Entity
@@ -27,7 +24,7 @@ public class QueueAuditLogEntity extends BaseEntity {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
-    private UsersEntity user;
+    private UserEntity user;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
