@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "concert_seats")
@@ -37,6 +36,6 @@ public class ConcertSeatEntity {
 
     @NotNull
     @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    private Long price;
 
 }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import kr.hhplus.be.server.api.clean.infrastructure.persistence.jpa.payment.PaymentEntity;
 import kr.hhplus.be.server.api.layered.entity.user.UsersEntity;
+import kr.hhplus.be.server.common.enums.WalletTransactionType;
 import kr.hhplus.be.server.common.jpa.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,9 +34,9 @@ public class WalletTransactionEntity extends BaseEntity {
     private Long amount;
 
     @NotNull
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private String type;
+    private WalletTransactionType type;
 
     @Size(max = 36)
     @Column(name = "idempotency_key", length = 36)

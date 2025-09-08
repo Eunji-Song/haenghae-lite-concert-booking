@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import kr.hhplus.be.server.api.layered.entity.concert.ConcertEntity;
 import kr.hhplus.be.server.api.layered.entity.user.UsersEntity;
+import kr.hhplus.be.server.common.enums.QueueStatus;
 import kr.hhplus.be.server.common.jpa.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,9 +35,9 @@ public class QueueAuditLogEntity extends BaseEntity {
     private ConcertEntity concert;
 
     @NotNull
-    @Lob
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private QueueStatus status;
 
     @Column(name = "rank_position", columnDefinition = "int UNSIGNED")
     private Long rankPosition;

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import kr.hhplus.be.server.api.clean.infrastructure.persistence.jpa.reservation.ReservationEntity;
+import kr.hhplus.be.server.common.enums.PaymentStatus;
 import kr.hhplus.be.server.common.jpa.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -40,9 +41,9 @@ public class PaymentEntity extends BaseEntity {
     private String providerTxnId;
 
     @NotNull
-    @Lob
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private PaymentStatus status;
 
     @Column(name = "succeeded_at")
     private LocalDateTime succeededAt;

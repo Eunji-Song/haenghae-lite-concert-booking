@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.hhplus.be.server.api.layered.entity.concert.ConcertDateEntity;
 import kr.hhplus.be.server.api.layered.entity.concert.ConcertSeatEntity;
 import kr.hhplus.be.server.api.layered.entity.user.UsersEntity;
+import kr.hhplus.be.server.common.enums.ReservationStatus;
 import kr.hhplus.be.server.common.jpa.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,9 +38,9 @@ public class ReservationEntity extends BaseEntity {
     private ConcertSeatEntity concertSeats;
 
     @NotNull
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private ReservationStatus status;
 
     @NotNull
     @Column(name = "amount", nullable = false)
