@@ -1,0 +1,48 @@
+package kr.hhplus.be.server.api.layered.entity.queue;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import kr.hhplus.be.server.api.layered.entity.concert.ConcertEntity;
+import kr.hhplus.be.server.api.layered.entity.user.UsersEntity;
+import kr.hhplus.be.server.common.jpa.BaseEntity;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+
+@Entity
+@Table(name = "queue_audit_logs")
+@Getter
+@SQLDelete(sql = "UPDATE queue_audit_logs SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+public class QueueAuditLogEntity extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
+    private UsersEntity user;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "concert_id", nullable = false)
+    private ConcertEntity concert;
+
+    @NotNull
+    @Lob
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    @Column(name = "rank_position", columnDefinition = "int UNSIGNED")
+    private Long rankPosition;
+
+    @Size(max = 255)
+    @Column(name = "note")
+    private String note;
+
+}
