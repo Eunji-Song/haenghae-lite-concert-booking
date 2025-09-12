@@ -3,6 +3,7 @@ package kr.hhplus.be.server.api.layered.entity.user;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -13,9 +14,11 @@ import kr.hhplus.be.server.common.jpa.BaseEntity;
 @Entity
 @Table(name = "users")
 @Getter
+@Builder
 @SQLDelete(sql = "UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted_at is null")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class UserEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +39,10 @@ public class UserEntity extends BaseEntity {
 
     @NotBlank(message = "비밀번호는 필수 입력값입니다.")
     @Size(min = 8, max = 255, message = "비밀번호는 최소 8자 이상, 최대 255자 이내여야 합니다.")
+    @Pattern(
+            regexp = "^(?=.*[A-Za-z].*[A-Za-z]|.*\\d.*\\d|.*[!@#$%^&*()_+\\-={}\\[\\]|:;\"'<>,.?/`~\\\\].*[!@#$%^&*()_+\\-={}\\[\\]|:;\"'<>,.?/`~\\\\]).{8,}$",
+            message = "비밀번호는 최소 8자이며, 대문자/소문자/숫자/특수문자 중 2종 이상을 포함해야 합니다."
+    )
     @Column(nullable = false, length = 255)
     @Comment("비밀번호(해시값)")
     private String password;
@@ -45,4 +52,5 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false, length = 50)
     @Comment("사용자 이름")
     private String name;
+
 }

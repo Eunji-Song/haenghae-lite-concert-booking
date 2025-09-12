@@ -29,3 +29,14 @@ spring:
     url: jdbc:mysql://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
     username: application
     password: application
+
+jwt:
+  access:
+    secret: "h9J@3kLmP!s8zVxQ1rYtBnE2wU7dF4gH6aZcXvTqP0oRjSlMNbKdWuYpAzCfGh"
+    expiry-seconds: 1800        # 30m
+  refresh:
+    secret: "QwErTyUiOpAsDfGhJkLzXcVbNm1234567890!@#$%^&*()-_=+[]{},.<>/?"
+    expiry-seconds: 2592000     # 30d
+  queue:
+    secret: "zXcVbNmAsDfGhJkLqWeRtYuIoP0987654321)(*&^%$#@!~AaBbCcDdEeFf"
+    expiry-seconds: 900         # 15m

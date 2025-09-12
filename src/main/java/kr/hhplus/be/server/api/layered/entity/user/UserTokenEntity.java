@@ -5,9 +5,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import kr.hhplus.be.server.common.jpa.BaseEntity;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
@@ -15,9 +13,11 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "user_tokens")
 @Getter
+@Builder
 @SQLDelete(sql = "UPDATE user_tokens SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted_at is null")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class UserTokenEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

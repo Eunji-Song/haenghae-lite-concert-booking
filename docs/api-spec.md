@@ -255,6 +255,11 @@ POST /api/v1/reservations
       <td>EMAIL_ALREADY_EXISTS</td>
       <td>이미 가입된 이메일</td>
     </tr>
+<tr>
+      <td>400</td>
+      <td>INVALID_EMAIL_FORMAT</td>
+      <td>올바르지 않은 이메일 형식 입력</td>
+    </tr>
     <tr>
       <td>429</td>
       <td>RATE_LIMITED</td>
@@ -324,11 +329,6 @@ POST /api/v1/reservations
       <td>int</td>
       <td>Refresh 토큰 만료 시간(초). 예: 2592000(=30일)</td>
     </tr>
-    <tr>
-      <td>tokenType</td>
-      <td>string</td>
-      <td>토큰 타입. 기본값 <code>Bearer</code></td>
-    </tr>
   </tbody>
 </table>
 
@@ -349,13 +349,8 @@ POST /api/v1/reservations
     </tr>
     <tr>
       <td>401</td>
-      <td>INVALID_CREDENTIALS</td>
+      <td>INVALID_EMAIL_FORMAT</td>
       <td>이메일 또는 비밀번호 불일치(보안상 권장 응답)</td>
-    </tr>
-    <tr>
-      <td>404</td>
-      <td>USER_NOT_FOUND</td>
-      <td>회원 정보가 존재하지 않음(선택: 서비스 정책에 따라 401로 통합 가능)</td>
     </tr>
     <tr>
       <td>429</td>
