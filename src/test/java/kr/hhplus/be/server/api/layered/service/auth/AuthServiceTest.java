@@ -8,7 +8,7 @@ import kr.hhplus.be.server.api.layered.entity.user.UserTokenEntity;
 import kr.hhplus.be.server.api.layered.repository.user.UserRepository;
 import kr.hhplus.be.server.api.layered.repository.user.UserTokenRepository;
 import kr.hhplus.be.server.common.exception.*;
-import kr.hhplus.be.server.common.security.JwtTokenProvider;
+import kr.hhplus.be.server.common.security.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

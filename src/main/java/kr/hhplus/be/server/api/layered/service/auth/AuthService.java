@@ -10,7 +10,7 @@ import kr.hhplus.be.server.api.layered.repository.user.UserTokenRepository;
 import kr.hhplus.be.server.common.exception.EmailAlreadyExistsException;
 import kr.hhplus.be.server.common.exception.InvalidEmailFormatException;
 import kr.hhplus.be.server.common.exception.LoginFailedException;
-import kr.hhplus.be.server.common.security.JwtTokenProvider;
+import kr.hhplus.be.server.common.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
