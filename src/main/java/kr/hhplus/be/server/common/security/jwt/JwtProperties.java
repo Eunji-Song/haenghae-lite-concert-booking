@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.common.security;
+package kr.hhplus.be.server.common.security.jwt;
 
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.common.security;
+package kr.hhplus.be.server.common.security.jwt;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.common.security;
+package kr.hhplus.be.server.common.security.jwt;
 
 import jakarta.servlet.http.*;
 import org.springframework.security.web.AuthenticationEntryPoint;

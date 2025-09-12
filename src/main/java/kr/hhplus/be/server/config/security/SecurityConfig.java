@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.config.security;
 
-import kr.hhplus.be.server.common.security.JwtAuthenticationEntryPoint;
-import kr.hhplus.be.server.common.security.JwtAuthenticationFilter;
-import kr.hhplus.be.server.common.security.JwtProperties;
-import kr.hhplus.be.server.common.security.JwtTokenProvider;
+import kr.hhplus.be.server.common.security.jwt.JwtAuthenticationEntryPoint;
+import kr.hhplus.be.server.common.security.jwt.JwtAuthenticationFilter;
+import kr.hhplus.be.server.common.security.jwt.JwtProperties;
+import kr.hhplus.be.server.common.security.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration {
+public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {

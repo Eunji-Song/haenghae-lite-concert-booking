@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.common.security;
+package kr.hhplus.be.server.common.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
