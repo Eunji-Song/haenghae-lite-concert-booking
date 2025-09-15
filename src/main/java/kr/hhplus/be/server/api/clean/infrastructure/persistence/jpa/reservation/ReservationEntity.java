@@ -2,21 +2,22 @@ package kr.hhplus.be.server.api.clean.infrastructure.persistence.jpa.reservation
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import kr.hhplus.be.server.api.layered.entity.concert.ConcertDateEntity;
-import kr.hhplus.be.server.api.layered.entity.concert.ConcertSeatEntity;
+import kr.hhplus.be.server.common.entity.concert.ConcertDateEntity;
+import kr.hhplus.be.server.common.entity.concert.ConcertSeatEntity;
 import kr.hhplus.be.server.api.layered.entity.user.UserEntity;
 import kr.hhplus.be.server.common.enums.ReservationStatus;
 import kr.hhplus.be.server.common.jpa.BaseEntity;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 
 @Entity
 @Table(name = "reservations")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservationEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

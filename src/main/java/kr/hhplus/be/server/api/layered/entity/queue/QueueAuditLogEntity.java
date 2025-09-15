@@ -3,7 +3,7 @@ package kr.hhplus.be.server.api.layered.entity.queue;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import kr.hhplus.be.server.api.layered.entity.concert.ConcertEntity;
+import kr.hhplus.be.server.common.entity.concert.ConcertEntity;
 import kr.hhplus.be.server.api.layered.entity.user.UserEntity;
 import kr.hhplus.be.server.common.enums.QueueStatus;
 import kr.hhplus.be.server.common.jpa.BaseEntity;

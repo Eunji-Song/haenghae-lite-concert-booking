@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.api.layered.entity.concert;
+package kr.hhplus.be.server.common.entity.concert;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

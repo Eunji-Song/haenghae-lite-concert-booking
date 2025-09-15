@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import kr.hhplus.be.server.api.layered.dto.queue.QueueTokenRequest;
 import kr.hhplus.be.server.api.layered.dto.queue.QueueTokenResponse;
-import kr.hhplus.be.server.api.layered.entity.concert.ConcertEntity;
+import kr.hhplus.be.server.common.entity.concert.ConcertEntity;
 import kr.hhplus.be.server.api.layered.entity.queue.QueueAuditLogEntity;
 import kr.hhplus.be.server.api.layered.entity.user.UserEntity;
 import kr.hhplus.be.server.api.layered.infrastructure.queue.InMemoryQueueManager;
@@ -13,9 +13,9 @@ import kr.hhplus.be.server.api.layered.repository.queue.QueueAuditLogRepository;
 import kr.hhplus.be.server.api.layered.service.concert.ConcertService;
 import kr.hhplus.be.server.api.layered.service.user.UserService;
 import kr.hhplus.be.server.common.enums.QueueStatus;
-import kr.hhplus.be.server.common.exception.AlreadyInQueueException;
-import kr.hhplus.be.server.common.exception.ConcertNotAvailableException;
-import kr.hhplus.be.server.common.exception.InvalidQueueTokenException;
+import kr.hhplus.be.server.common.exception.queue.AlreadyInQueueException;
+import kr.hhplus.be.server.common.exception.concert.ConcertNotAvailableException;
+import kr.hhplus.be.server.common.exception.queue.InvalidQueueTokenException;
 import kr.hhplus.be.server.common.security.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -171,7 +171,7 @@ class QueueServiceTest {
         when(inMemoryQueueManager.getQueueRank(userId, concertId)).thenReturn(5L);
 
         // When
-        QueueTokenResponse response = queueService.getQueueStatus(queueToken);
+        QueueTokenResponse response = queueService.getQueueStatus(userUuid, queueToken);
 
 
         // Then
@@ -202,7 +202,7 @@ class QueueServiceTest {
         when(inMemoryQueueManager.isActiveUser(userId, concertId)).thenReturn(true);
 
         // When
-        QueueTokenResponse response = queueService.getQueueStatus(queueToken);
+        QueueTokenResponse response = queueService.getQueueStatus(userUuid, queueToken);
 
         // Then
         assertThat(response.getStatus()).isEqualTo(QueueStatus.ACTIVE);
@@ -231,7 +231,7 @@ class QueueServiceTest {
         when(inMemoryQueueManager.isInQueue(userId, concertId)).thenReturn(false);
 
         // When
-        QueueTokenResponse response = queueService.getQueueStatus(queueToken);
+        QueueTokenResponse response = queueService.getQueueStatus(userUuid, queueToken);
 
         // Then
         assertThat(response.getStatus()).isEqualTo(QueueStatus.EXPIRED);
@@ -242,12 +242,13 @@ class QueueServiceTest {
     void 유효하지_않은_토큰으로_상태_조회_실패() {
         // Given
         String invalidToken = "invalid-token";
+        String userUuid = userUuid();
 
         when(jwtTokenProvider.parseQueue(invalidToken))
                 .thenThrow(new RuntimeException("Invalid token"));
 
         // When & Then
-        assertThatThrownBy(() -> queueService.getQueueStatus(invalidToken))
+        assertThatThrownBy(() -> queueService.getQueueStatus(userUuid, invalidToken))
                 .isInstanceOf(InvalidQueueTokenException.class);
     }
 }

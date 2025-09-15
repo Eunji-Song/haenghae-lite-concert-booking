@@ -3,7 +3,7 @@ package kr.hhplus.be.server.api.layered.service.queue;
 
 import kr.hhplus.be.server.api.layered.dto.queue.QueueTokenRequest;
 import kr.hhplus.be.server.api.layered.dto.queue.QueueTokenResponse;
-import kr.hhplus.be.server.api.layered.entity.concert.ConcertEntity;
+import kr.hhplus.be.server.common.entity.concert.ConcertEntity;
 import kr.hhplus.be.server.api.layered.entity.queue.QueueAuditLogEntity;
 import kr.hhplus.be.server.api.layered.entity.user.UserEntity;
 import kr.hhplus.be.server.api.layered.infrastructure.queue.InMemoryQueueManager;
@@ -12,9 +12,8 @@ import kr.hhplus.be.server.api.layered.repository.queue.QueueAuditLogRepository;
 import kr.hhplus.be.server.api.layered.service.concert.ConcertService;
 import kr.hhplus.be.server.api.layered.service.user.UserService;
 import kr.hhplus.be.server.common.enums.QueueStatus;
-import kr.hhplus.be.server.common.exception.AlreadyInQueueException;
-import kr.hhplus.be.server.common.exception.ConcertNotAvailableException;
-import kr.hhplus.be.server.common.exception.InvalidQueueTokenException;
+import kr.hhplus.be.server.common.exception.queue.AlreadyInQueueException;
+import kr.hhplus.be.server.common.exception.queue.InvalidQueueTokenException;
 import kr.hhplus.be.server.common.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -75,11 +74,10 @@ public class QueueService {
 
 
     // 대기열 상태 조회
-    public QueueTokenResponse getQueueStatus(String queueToken) {
+    public QueueTokenResponse getQueueStatus(String userUuid, String queueToken) {
         try {
             // 토큰 파싱
             var claims = jwtTokenProvider.parseQueue(queueToken);
-            String userUuid = claims.getBody().getSubject();
             Long concertId = Long.valueOf(claims.getBody().get("concertId").toString());
 
             // 사용자 검증
