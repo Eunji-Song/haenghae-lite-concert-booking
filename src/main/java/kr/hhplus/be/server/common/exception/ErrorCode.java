@@ -31,13 +31,22 @@ public enum ErrorCode {
     // 좌석/예약 관련
     SEAT_NOT_AVAILABLE(HttpStatus.CONFLICT, "SEAT001", "예약할 수 없는 좌석입니다"),
     SEAT_ALREADY_RESERVED(HttpStatus.CONFLICT, "SEAT002", "이미 예약된 좌석입니다"),
+    SEAT_NOT_FOUND(HttpStatus.NOT_FOUND, "SEAT003", "좌석을 찾을 수 없습니다"),
+
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "RESV001", "예약을 찾을 수 없습니다"),
     RESERVATION_EXPIRED(HttpStatus.GONE, "RESV002", "예약이 만료되었습니다"),
+    INVALID_RESERVATION_STATUS(HttpStatus.BAD_REQUEST, "RESV003", "예약 상태가 올바르지 않습니다"),
+    RESERVATION_ALREADY_CONFIRMED(HttpStatus.CONFLICT, "RESV004", "이미 확정된 예약입니다"),
+    RESERVATION_ALREADY_CANCELED(HttpStatus.CONFLICT, "RESV005", "이미 취소된 예약입니다"),
+    RESERVATION_HOLD_EXPIRED(HttpStatus.GONE, "RESV006", "예약 홀드 시간이 만료되었습니다"),
+    RESERVATION_ACCESS_DENIED(HttpStatus.FORBIDDEN, "RESV007", "예약에 대한 접근 권한이 없습니다"),
+
 
     // 결제 관련
     INSUFFICIENT_BALANCE(HttpStatus.PAYMENT_REQUIRED, "PAY001", "잔액이 부족합니다"),
     PAYMENT_FAILED(HttpStatus.BAD_REQUEST, "PAY002", "결제에 실패했습니다"),
     DUPLICATE_PAYMENT(HttpStatus.CONFLICT, "PAY003", "중복 결제 요청입니다"),
+    PAYMENT_AMOUNT_MISMATCH(HttpStatus.BAD_REQUEST, "PAY004", "결제 금액이 일치하지 않습니다"),
 
     // 대기열 관련
     QUEUE_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "QUEUE001", "유효하지 않은 대기열 토큰입니다"),
