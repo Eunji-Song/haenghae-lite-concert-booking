@@ -2,7 +2,7 @@ package kr.hhplus.be.server.api.layered.service.user;
 
 import kr.hhplus.be.server.api.layered.entity.user.UserEntity;
 import kr.hhplus.be.server.api.layered.repository.user.UserRepository;
-import kr.hhplus.be.server.common.exception.UserNotFoundException;
+import kr.hhplus.be.server.common.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

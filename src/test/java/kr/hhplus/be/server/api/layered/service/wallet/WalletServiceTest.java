@@ -8,7 +8,7 @@ import kr.hhplus.be.server.api.layered.repository.wallet.WalletAccountRepository
 import kr.hhplus.be.server.api.layered.repository.wallet.WalletTransactionRepository;
 import kr.hhplus.be.server.api.layered.service.user.UserService;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.exception.InvalidChargeAmountException;
+import kr.hhplus.be.server.common.exception.wallet.InvalidChargeAmountException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
