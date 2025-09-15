@@ -39,6 +39,7 @@ public class AuthService {
     private final WalletService walletService;
 
 
+    @Transactional
     public void signup(SignupRequest request) {
         validateEmailFormat(request.getEmail());
         validateEmailNotExists(request.getEmail());
