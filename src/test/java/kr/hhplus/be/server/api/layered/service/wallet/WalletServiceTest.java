@@ -30,7 +30,7 @@ class WalletServiceTest {
     @Mock WalletAccountRepository walletAccountRepository;
     @Mock WalletTransactionRepository walletTransactionRepository;
 
-    @InjectMocks WalletService walletService;  // ← SUT는 하나만
+    @InjectMocks WalletService walletService;
 
     private String anyUuid() { return UUID.randomUUID().toString(); }
 

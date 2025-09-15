@@ -7,6 +7,7 @@ import kr.hhplus.be.server.api.layered.entity.user.UserEntity;
 import kr.hhplus.be.server.api.layered.entity.user.UserTokenEntity;
 import kr.hhplus.be.server.api.layered.repository.user.UserRepository;
 import kr.hhplus.be.server.api.layered.repository.user.UserTokenRepository;
+import kr.hhplus.be.server.api.layered.service.wallet.WalletService;
 import kr.hhplus.be.server.common.exception.EmailAlreadyExistsException;
 import kr.hhplus.be.server.common.exception.InvalidEmailFormatException;
 import kr.hhplus.be.server.common.exception.LoginFailedException;
@@ -24,6 +25,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthService {
+
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
     );
@@ -34,6 +36,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final WalletService walletService;
+
 
     public void signup(SignupRequest request) {
         validateEmailFormat(request.getEmail());
@@ -41,6 +45,8 @@ public class AuthService {
 
         UserEntity user = createUser(request);
         userRepository.save(user);
+
+        walletService.createWallet(user.getUserUuid());
     }
 
     @Transactional
