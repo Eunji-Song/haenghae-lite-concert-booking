@@ -1,0 +1,555 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /api/v1/wallet/charge:
+    post:
+      tags:
+      - 충전 계좌
+      summary: 충전
+      operationId: charge
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalletChargeRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WalletBalanceResponse"
+  /api/v1/reservations:
+    post:
+      tags:
+      - 예약
+      summary: 좌석 예약(홀드)
+      operationId: reserveSeat
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: X-Queue-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReserveSeatRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReservationResponse"
+  /api/v1/reservations/{reservationId}/cancel:
+    post:
+      tags:
+      - 예약
+      summary: 예약 취소
+      operationId: cancelReservation
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: reservationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CancelReservationResponse"
+  /api/v1/queue/token:
+    post:
+      tags:
+      - 대기열
+      summary: 대기열 토큰 발급
+      operationId: issue
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueueTokenRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QueueTokenResponse"
+  /api/v1/payments:
+    post:
+      tags:
+      - 결제
+      summary: 결제 & 예약 확정
+      operationId: pay
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: X-Queue-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+  /api/v1/auth/signup:
+    post:
+      tags:
+      - 인증
+      summary: 회원가입
+      operationId: signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /api/v1/auth/login:
+    post:
+      tags:
+      - 인증
+      summary: 로그인
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserToken"
+  /api/v1/wallet/balance:
+    get:
+      tags:
+      - 충전 계좌
+      summary: 잔액 조회
+      operationId: getBalance
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WalletBalanceResponse"
+  /api/v1/reservations/{reservationId}:
+    get:
+      tags:
+      - 예약
+      summary: 예약 상세
+      operationId: getReservation
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: reservationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReservationDetailResponse"
+  /api/v1/reservations/me:
+    get:
+      tags:
+      - 예약
+      summary: 내 예약 목록
+      operationId: getMyReservations
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReservationSummaryResponse"
+  /api/v1/queue/me:
+    get:
+      tags:
+      - 대기열
+      summary: 대기 상태 폴링 (활성 대기)
+      operationId: me
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: X-Queue-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QueueTokenResponse"
+  /api/v1/concerts/{concertId}/dates:
+    get:
+      tags:
+      - 콘서트 일정 및 좌석
+      summary: 콘서트 예약 가능 일자 조회
+      operationId: getOpenDates
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: X-Queue-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: concertId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenDateResponse"
+  /api/v1/concerts/{concertId}/dates/{date}/seats:
+    get:
+      tags:
+      - 콘서트 일정 및 좌석
+      summary: 콘서트 예약 가능 일자별 좌석 조회
+      operationId: getSeats
+      parameters:
+      - name: userUuid
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: X-Queue-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: concertId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: date
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SeatAvailabilityResponse"
+components:
+  schemas:
+    WalletChargeRequest:
+      type: object
+      properties:
+        amount:
+          type: integer
+          format: int64
+    WalletBalanceResponse:
+      type: object
+      properties:
+        balance:
+          type: integer
+          format: int64
+        currency:
+          type: string
+        lastUpdatedAt:
+          type: string
+          format: date-time
+    ReserveSeatRequest:
+      required:
+      - concertId
+      - date
+      - seatNo
+      type: object
+      properties:
+        concertId:
+          type: integer
+          format: int64
+        date:
+          type: string
+        seatNo:
+          minimum: 1
+          type: integer
+          format: int64
+    ReservationResponse:
+      type: object
+      properties:
+        reservationId:
+          type: integer
+          format: int64
+        holdExpiresAt:
+          type: string
+          format: date-time
+    CancelReservationResponse:
+      type: object
+      properties:
+        canceled:
+          type: boolean
+    QueueTokenRequest:
+      type: object
+      properties:
+        concertId:
+          type: integer
+          format: int64
+    QueueTokenResponse:
+      type: object
+      properties:
+        queueToken:
+          type: string
+        status:
+          type: string
+          enum:
+          - ISSUED
+          - ACTIVE
+          - EXPIRED
+        rank:
+          type: integer
+          format: int64
+        etaSeconds:
+          type: integer
+          format: int64
+    PaymentRequest:
+      required:
+      - amount
+      - reservationId
+      type: object
+      properties:
+        reservationId:
+          type: integer
+          format: int64
+        amount:
+          minimum: 1
+          type: integer
+          format: int64
+    PaymentResponse:
+      type: object
+      properties:
+        paymentId:
+          type: integer
+          format: int64
+        reservationId:
+          type: integer
+          format: int64
+        confirmed:
+          type: boolean
+    SignupRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    UserToken:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        accessTokenExpiresIn:
+          type: integer
+          format: int32
+        refreshToken:
+          type: string
+        refreshTokenExpiresIn:
+          type: integer
+          format: int32
+    ReservationDetailResponse:
+      type: object
+      properties:
+        reservationId:
+          type: integer
+          format: int64
+        concertId:
+          type: integer
+          format: int64
+        date:
+          type: string
+        seatNo:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+          - PENDING
+          - CONFIRMED
+          - CANCELED
+          - EXPIRED
+        paidAmount:
+          type: integer
+          format: int64
+        holdExpiresAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ReservationSummaryResponse:
+      type: object
+      properties:
+        reservationId:
+          type: integer
+          format: int64
+        concertId:
+          type: integer
+          format: int64
+        date:
+          type: string
+        seatNo:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+          - PENDING
+          - CONFIRMED
+          - CANCELED
+          - EXPIRED
+        paidAmount:
+          type: integer
+          format: int64
+    OpenDateResponse:
+      type: object
+      properties:
+        concertDateId:
+          type: integer
+          format: int64
+        concertId:
+          type: integer
+          format: int64
+        date:
+          type: string
+          format: date
+        open:
+          type: boolean
+    SeatAvailabilityResponse:
+      type: object
+      properties:
+        seatId:
+          type: integer
+          format: int64
+        seatNo:
+          type: integer
+          format: int64
+        price:
+          type: integer
+          format: int64
+        state:
+          type: string

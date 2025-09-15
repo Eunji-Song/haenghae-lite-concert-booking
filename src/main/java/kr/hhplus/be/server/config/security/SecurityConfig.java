@@ -46,9 +46,12 @@ public class SecurityConfig {
                 .exceptionHandling(eh -> eh.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/v1/auth/**",        // 로그인/회원가입/토큰 리프레시
-                                "/actuator/health"        // 헬스체크
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs.yaml"
                         ).permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwt), UsernamePasswordAuthenticationFilter.class);
