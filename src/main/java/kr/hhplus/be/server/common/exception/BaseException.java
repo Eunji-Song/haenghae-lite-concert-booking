@@ -8,6 +8,12 @@ public abstract class BaseException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+    // 추가 생성자
+    protected BaseException(ErrorCode errorCode, String customMessage) {
+        super(customMessage);
+        this.errorCode = errorCode;
+    }
+
     public ErrorCode getErrorCode() {
         return errorCode;
     }

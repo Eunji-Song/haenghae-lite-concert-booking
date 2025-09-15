@@ -205,6 +205,7 @@ POST /api/v1/reservations
 - [13. 예약 취소](#api-13)
 - [14. 예약 상세 조회](#api-14)
 - [15. Access Token Refresh](#api-15)
+- [16. 대기 상태 폴링](#api-16)
 
 <a id="api-1"></a>
 ### 1. 회원가입
@@ -1492,3 +1493,110 @@ POST /api/v1/reservations
     </tr>
   </tbody>
 </table>
+
+<a id="api-16"></a>
+
+### 15. 대기 상태 폴링 (활성화 대기)
+
+- Method: GET
+- URL: /api/v1/queue/me
+- Description: 사용자가 발급받은 대기열 토큰(X-Queue-Token)의 현재 상태를 조회. 클라이언트는 일정 주기로 이 API를 호출하여 자신의 상태가 ACTIVE로 전환되었는지 확인
+
+#### Headers
+
+- Content-Type: application/json
+- Authorization: Bearer <Access JWT> (사용자 인증)
+- X-Queue-Token: <Queue JWT> (대기열 토큰, 필수)
+
+#### Request Body
+
+**Response Body**
+
+```json
+{
+  "status": "QUEUED",
+  "rank": 12,
+  "etaSeconds": 180,
+  "remainingSeconds": null
+}
+```
+
+**Response Value**
+<table>
+  <thead>
+    <tr>
+      <th>필드</th>
+      <th>타입</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>queueToken</td>
+      <td>string</td>
+      <td>대기열 JWT. 이후 예매 관련 API에서 <code>X-Queue-Token</code> 헤더로 전송</td>
+    </tr>
+    <tr>
+      <td>status</td>
+      <td>string</td>
+      <td>대기 상태. <code>ISSUED</code>(대기 중) / <code>ACTIVE</code>(입장 가능)</td>
+    </tr>
+    <tr>
+      <td>rank</td>
+      <td>int</td>
+      <td>현재 대기 순번 (0이 맨 앞)</td>
+    </tr>
+    <tr>
+      <td>etaSeconds</td>
+      <td>int</td>
+      <td>예상 대기 시간(초)</td>
+    </tr>
+  </tbody>
+</table>
+
+
+**Errors**
+<table>
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Name</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>400</td>
+      <td>VALIDATION_ERROR</td>
+      <td><code>concertId</code> 누락/형식 오류</td>
+    </tr>
+    <tr>
+      <td>401</td>
+      <td>UNAUTHORIZED</td>
+      <td>Access 토큰 누락/만료/유효하지 않음</td>
+    </tr>
+    <tr>
+      <td>401</td>
+      <td>INVALID_QUEUE_TOKEN</td>
+      <td>잘못된 대기열 토큰</td>
+    </tr>
+    <tr>
+      <td>403</td>
+      <td>QUEUE_NOT_ACTIVE
+OSED</td>
+      <td>아직 ACTIVE 상태가 아님 (status=QUEUED)
+</td>
+    </tr>
+    <tr>
+      <td>409</td>
+      <td>QUEUE_EXPIRED</td>
+      <td>대기열 토큰이 만료됨</td>
+    </tr>
+    <tr>
+      <td>429</td>
+      <td>RATE_LIMITED</td>
+      <td>짧은 시간 내 과도한 대기열 입장 요청</td>
+    </tr>
+  </tbody>
+</table>
+

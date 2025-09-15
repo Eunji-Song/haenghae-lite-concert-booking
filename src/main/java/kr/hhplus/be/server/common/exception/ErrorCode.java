@@ -23,6 +23,10 @@ public enum ErrorCode {
     INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "WALLET002", "충전/차감 금액이 올바르지 않습니다"),
     IDEMPOTENCY_KEY_REUSED(HttpStatus.UNPROCESSABLE_ENTITY, "WALLET003", "멱등 키가 이미 사용되었습니다"),
 
+    // 콘서트 관련
+    CONCERT_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "CONCERT001", "예약할 수 없는 콘서트입니다"),
+    CONCERT_NOT_FOUND(HttpStatus.NOT_FOUND, "CONCERT002", "콘서트를 찾을 수 없습니다"),
+    CONCERT_DATE_NOT_OPEN(HttpStatus.BAD_REQUEST, "CONCERT003", "해당 날짜는 예약이 오픈되지 않았습니다"),
 
     // 좌석/예약 관련
     SEAT_NOT_AVAILABLE(HttpStatus.CONFLICT, "SEAT001", "예약할 수 없는 좌석입니다"),
@@ -38,6 +42,11 @@ public enum ErrorCode {
     // 대기열 관련
     QUEUE_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "QUEUE001", "유효하지 않은 대기열 토큰입니다"),
     QUEUE_NOT_ACTIVE(HttpStatus.FORBIDDEN, "QUEUE002", "대기열이 활성화되지 않았습니다"),
+
+    ALREADY_IN_QUEUE(HttpStatus.CONFLICT, "QUEUE003", "이미 대기열에 등록된 사용자입니다"),
+    INVALID_QUEUE_TOKEN(HttpStatus.UNAUTHORIZED, "QUEUE004", "대기열 토큰이 유효하지 않습니다"),
+    QUEUE_EXPIRED(HttpStatus.GONE, "QUEUE005", "대기열 토큰이 만료되었습니다"),
+    QUEUE_CLOSED(HttpStatus.FORBIDDEN, "QUEUE006", "해당 콘서트 대기열이 닫혀있습니다"),
 
     // 서버 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SYS001", "서버 내부 오류가 발생했습니다"),

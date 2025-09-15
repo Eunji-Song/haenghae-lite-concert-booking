@@ -17,4 +17,9 @@ public class UserService {
         return userRepository.findByUserUuid(userUuid)
                 .orElseThrow(UserNotFoundException::new);
     }
+
+    public UserEntity getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+    }
 }

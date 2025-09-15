@@ -7,14 +7,20 @@ import kr.hhplus.be.server.api.layered.entity.concert.ConcertEntity;
 import kr.hhplus.be.server.api.layered.entity.user.UserEntity;
 import kr.hhplus.be.server.common.enums.QueueStatus;
 import kr.hhplus.be.server.common.jpa.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
 
 @Entity
 @Table(name = "queue_audit_logs")
 @Getter
+@Builder
 @SQLDelete(sql = "UPDATE queue_audit_logs SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@NoArgsConstructor
+@AllArgsConstructor
 public class QueueAuditLogEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
