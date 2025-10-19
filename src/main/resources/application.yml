@@ -3,6 +3,77 @@ spring:
     name: hhplus
   profiles:
     active: local
+  jpa:
+    open-in-view: false
+    generate-ddl: false
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        timezone:
+          default_storage: NORMALIZE_UTC
+        jdbc:
+          time_zone: UTC
+
+# JWT 설정 (모든 환경 공통)
+jwt:
+  access:
+    secret: "h9J@3kLmP!s8zVxQ1rYtBnE2wU7dF4gH6aZcXvTqP0oRjSlMNbKdWuYpAzCfGh"
+    expiration: 1800        # 30m
+  refresh:
+    secret: "QwErTyUiOpAsDfGhJkLzXcVbNm1234567890!@#$%^&*()-_=+[]{},.<>/?"
+    expiration: 2592000     # 30d
+  queue:
+    secret: "zXcVbNmAsDfGhJkLqWeRtYuIoP0987654321)(*&^%$#@!~AaBbCcDdEeFf"
+    expiration: 900         # 15m
+
+---
+# local 프로파일 설정
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    name: HangHaePlusDataSource
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
+    username: application
+    password: application
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 3
+      connection-timeout: 10000
+      max-lifetime: 60000
+
+---
+# dev 프로파일 설정 (통합 테스트용)
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    name: HangHaePlusDataSource
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
+    username: application
+    password: application
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 3
+      connection-timeout: 10000
+      max-lifetime: 60000
+  jpa:
+    show-sql: true  # 테스트 시 SQL 로그 출력
+    hibernate:
+      ddl-auto: create-drop
+
+---
+# test 프로파일 설정 (단위 테스트 + data.sql 로딩)
+spring:
+  config:
+    activate:
+      on-profile: test
   datasource:
     name: HangHaePlusDataSource
     type: com.zaxxer.hikari.HikariDataSource
@@ -11,21 +82,17 @@ spring:
       connection-timeout: 10000
       max-lifetime: 60000
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
-    open-in-view: false
-    generate-ddl: false
-    show-sql: false
     hibernate:
-      ddl-auto: none
-    properties:
-      hibernate.timezone.default_storage: NORMALIZE_UTC
-      hibernate.jdbc.time_zone: UTC
+      ddl-auto: create-drop
+    show-sql: true
 
----
-spring.config.activate.on-profile: local, test
+  sql:
+    init:
+      mode: always      # 항상 SQL 스크립트 실행
+      data-locations: classpath:data.sql  # test 실행 시 data.sql 자동 실행
 
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
-    username: application
-    password: application
+  h2:
+    console:
+      enabled: true

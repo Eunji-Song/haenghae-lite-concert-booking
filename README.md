@@ -14,6 +14,6 @@ docker-compose up -d
 ```
 
 ### Docs
-- [API 명세서](./docs/api-spec.md)
+- [API 명세서](./docs/openapi.json)
 - [ERD](./docs/erd.md)
 - [인프라 구성도](./docs/infra.md)
