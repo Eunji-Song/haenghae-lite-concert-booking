@@ -1,101 +1,41 @@
 package kr.hhplus.be.server.config;
 
-import kr.hhplus.be.server.api.clean.application.port.out.payment.PaymentRepository;
-import kr.hhplus.be.server.api.clean.application.port.out.reservation.ConcertSeatRepository;
-import kr.hhplus.be.server.api.clean.application.port.out.reservation.ReservationRepository;
-import kr.hhplus.be.server.api.clean.infrastructure.persistence.jpa.concert.ConcertSeatJpaAdapter;
-import kr.hhplus.be.server.api.clean.infrastructure.persistence.jpa.payment.PaymentJpaAdapter;
-import kr.hhplus.be.server.api.clean.infrastructure.persistence.jpa.reservation.ReservationJpaAdapter;
-import kr.hhplus.be.server.api.clean.infrastructure.persistence.memory.InMemoryConcertSeatRepository;
-import kr.hhplus.be.server.api.clean.infrastructure.persistence.memory.InMemoryPaymentRepository;
-import kr.hhplus.be.server.api.clean.infrastructure.persistence.memory.InMemoryReservationRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * Repository 구현체 환경별 설정
- * - 테스트 환경: InMemory Repository (빠른 단위 테스트)
- * - 운영/개발 환경: JPA Adapter (실제 DB 연동)
+ * JPA Repository 스캔 설정
+ * - 도메인별 infrastructure.jpa.repository 패키지를 명시적으로 스캔
+ * - 트랜잭션 관리 활성화
+ *
+ * 참고:
+ *  - @SpringBootApplication의 컴포넌트 스캔만으로도 동작할 수 있으나,
+ *    리팩토링 후 레포지토리 위치가 흩어진 경우 명시적으로 잡아두면 안전합니다.
  */
-@Slf4j
 @Configuration
+@EnableTransactionManagement
+@EnableJpaRepositories(basePackages = {
+        // 공용(이관 전 레거시가 남아있다면 유지)
+        "kr.hhplus.be.server.common.repository",
+
+        // identity
+        "kr.hhplus.be.server.identity.infrastructure.jpa.repository",
+
+        // wallet
+        "kr.hhplus.be.server.wallet.infrastructure.jpa.repository",
+
+        // product
+        "kr.hhplus.be.server.product.infrastructure.jpa.repository",
+
+        // queue
+        "kr.hhplus.be.server.queue.infrastructure.jpa.repository",
+
+        // reservation (clean)
+        "kr.hhplus.be.server.reservation.infrastructure.persistence.jpa.repository",
+
+        // payment (clean)
+        "kr.hhplus.be.server.payment.infrastructure.persistence.jpa.repository"
+})
 public class RepositoryConfig {
-
-    // ============================================================
-    // ReservationRepository 환경별 설정
-    // ============================================================
-
-    /**
-     * 운영/개발 환경 - JPA Adapter 사용
-     */
-    @Bean
-    @Profile({"dev", "prod", "local", "default"})
-    public ReservationRepository reservationRepository(ReservationJpaAdapter jpaAdapter) {
-        log.info("ReservationRepository: JPA Adapter 사용");
-        return jpaAdapter;
-    }
-
-    /**
-     * 테스트 환경 - InMemory Repository 사용
-     */
-    @Bean
-    @Profile("test")
-    @ConditionalOnMissingBean(ReservationRepository.class)
-    public ReservationRepository testReservationRepository() {
-        log.info("ReservationRepository: InMemory Repository 사용");
-        return new InMemoryReservationRepository();
-    }
-
-    // ============================================================
-    // PaymentRepository 환경별 설정
-    // ============================================================
-
-    /**
-     * 운영/개발 환경 - JPA Adapter 사용
-     */
-    @Bean
-    @Profile({"dev", "prod", "local", "default"})
-    public PaymentRepository paymentRepository(PaymentJpaAdapter jpaAdapter) {
-        log.info("PaymentRepository: JPA Adapter 사용");
-        return jpaAdapter;
-    }
-
-    /**
-     * 테스트 환경 - InMemory Repository 사용
-     */
-    @Bean
-    @Profile("test")
-    @ConditionalOnMissingBean(PaymentRepository.class)
-    public PaymentRepository testPaymentRepository() {
-        log.info("PaymentRepository: InMemory Repository 사용");
-        return new InMemoryPaymentRepository();
-    }
-
-    // ============================================================
-    // ConcertSeatRepository 환경별 설정
-    // ============================================================
-
-    /**
-     * 운영/개발 환경 - JPA Adapter 사용 (레이어드 Repository 래핑)
-     */
-    @Bean
-    @Profile({"dev", "prod", "local", "default"})
-    public ConcertSeatRepository concertSeatRepository(ConcertSeatJpaAdapter jpaAdapter) {
-        log.info("ConcertSeatRepository: JPA Adapter 사용 (레이어드 래핑)");
-        return jpaAdapter;
-    }
-
-    /**
-     * 테스트 환경 - InMemory Repository 사용
-     */
-    @Bean
-    @Profile("test")
-    @ConditionalOnMissingBean(ConcertSeatRepository.class)
-    public ConcertSeatRepository testConcertSeatRepository() {
-        log.info("ConcertSeatRepository: InMemory Repository 사용");
-        return new InMemoryConcertSeatRepository();
-    }
 }
