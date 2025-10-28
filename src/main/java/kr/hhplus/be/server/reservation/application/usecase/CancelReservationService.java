@@ -1,12 +1,10 @@
 package kr.hhplus.be.server.reservation.application.usecase;
 
-import kr.hhplus.be.server.common.enums.ReservationStatus;
 import kr.hhplus.be.server.common.exception.reservation.ReservationAccessDeniedException;
 import kr.hhplus.be.server.common.exception.reservation.ReservationNotFoundException;
 import kr.hhplus.be.server.identity.infrastructure.jpa.repository.UserJpaRepository;
 import kr.hhplus.be.server.reservation.application.port.in.usecase.CancelReservationUseCase;
 import kr.hhplus.be.server.reservation.application.port.out.ReservationRepository;
-import kr.hhplus.be.server.reservation.domain.model.Reservation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +26,8 @@ public class CancelReservationService implements CancelReservationUseCase {
 
     @Override
     public void cancel(String userUuid, Long reservationId) {
-        // 사용자 ID 검증
-        var userId = userRepo.findIdByUserUuid(userUuid)
+        // 사용자 검증
+        Long userId = userRepo.findIdByUserUuid(userUuid)
                 .orElseThrow(ReservationAccessDeniedException::new);
 
         // 예약 조회
@@ -41,24 +39,10 @@ public class CancelReservationService implements CancelReservationUseCase {
             throw new ReservationAccessDeniedException();
         }
 
-        // 상태 업데이트: CANCELED
-        var canceled = new Reservation(
-                reservation.getId(),
-                reservation.getUserId(),
-                reservation.getConcertId(),
-                reservation.getConcertDateId(),
-                reservation.getSeatId(),
-                ReservationStatus.CANCELED,
-                reservation.getAmount(),
-                reservation.getHoldExpiresAt(),
-                reservation.getConfirmedAt(),
-                LocalDateTime.now(clock),
-                reservation.getExpiredAt(),
-                null,
-                reservation.getCreatedAt(),
-                reservation.getUpdatedAt()
-        );
+        // 도메인 로직으로 상태 변경
+        var canceled = reservation.cancel(LocalDateTime.now(clock));
 
+        // 변경된 상태 저장
         reservationRepository.save(canceled);
     }
 }

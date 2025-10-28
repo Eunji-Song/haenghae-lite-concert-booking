@@ -22,6 +22,7 @@ public class Reservation {
     private final LocalDateTime canceledAt;
     private final LocalDateTime expiredAt;
 
+    private final boolean isActive;
     private final Long version;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
@@ -38,6 +39,7 @@ public class Reservation {
             LocalDateTime confirmedAt,
             LocalDateTime canceledAt,
             LocalDateTime expiredAt,
+            boolean isActive,
             Long version,
             LocalDateTime createdAt,
             LocalDateTime updatedAt
@@ -53,25 +55,19 @@ public class Reservation {
         this.confirmedAt = confirmedAt;
         this.canceledAt = canceledAt;
         this.expiredAt = expiredAt;
+        this.isActive = isActive;
         this.version = version;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    // ===== Factory Methods =====
     public static Reservation pending(Long userId, Long concertId, Long concertDateId, Long seatId, long amount, LocalDateTime holdUntil) {
         return new Reservation(
-                null,
-                userId,
-                concertId,
-                concertDateId,
-                seatId,
-                ReservationStatus.PENDING,
-                amount,
-                holdUntil,
-                null, null, null,
-                0L,  // version 초기값
-                null, null
+                null, userId, concertId, concertDateId, seatId,
+                ReservationStatus.PENDING, amount,
+                holdUntil, null, null, null,
+                true,                // ★ 생성 시 활성
+                0L, null, null
         );
     }
 
@@ -81,15 +77,9 @@ public class Reservation {
         }
         return new Reservation(
                 this.id, this.userId, this.concertId, this.concertDateId, this.seatId,
-                ReservationStatus.CONFIRMED,
-                this.amount,
-                this.holdExpiresAt,
-                now,
-                this.canceledAt,
-                this.expiredAt,
-                this.version,
-                this.createdAt,
-                this.updatedAt
+                ReservationStatus.CONFIRMED, this.amount,
+                this.holdExpiresAt, now, this.canceledAt, this.expiredAt,
+                true, this.version, this.createdAt, this.updatedAt
         );
     }
 
@@ -97,15 +87,9 @@ public class Reservation {
         if (this.status == ReservationStatus.CANCELED) return this;
         return new Reservation(
                 this.id, this.userId, this.concertId, this.concertDateId, this.seatId,
-                ReservationStatus.CANCELED,
-                this.amount,
-                this.holdExpiresAt,
-                this.confirmedAt,
-                now,
-                this.expiredAt,
-                this.version,
-                this.createdAt,
-                this.updatedAt
+                ReservationStatus.CANCELED, this.amount,
+                this.holdExpiresAt, this.confirmedAt, now, this.expiredAt,
+                false, this.version, this.createdAt, this.updatedAt
         );
     }
 
@@ -113,15 +97,9 @@ public class Reservation {
         if (this.status != ReservationStatus.PENDING) return this;
         return new Reservation(
                 this.id, this.userId, this.concertId, this.concertDateId, this.seatId,
-                ReservationStatus.EXPIRED,
-                this.amount,
-                this.holdExpiresAt,
-                this.confirmedAt,
-                this.canceledAt,
-                now,
-                this.version,
-                this.createdAt,
-                this.updatedAt
+                ReservationStatus.EXPIRED, this.amount,
+                this.holdExpiresAt, this.confirmedAt, this.canceledAt, now,
+                false, this.version, this.createdAt, this.updatedAt
         );
     }
 

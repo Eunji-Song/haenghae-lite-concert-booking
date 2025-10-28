@@ -67,6 +67,7 @@ class ReserveSeatServiceTest {
                     r.getConfirmedAt(),
                     r.getCanceledAt(),
                     r.getExpiredAt(),
+                    true,
                     null,
                     r.getCreatedAt(),
                     r.getUpdatedAt()

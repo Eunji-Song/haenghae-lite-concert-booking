@@ -95,31 +95,45 @@ CREATE TABLE `reservations`
     `concert_id`      BIGINT UNSIGNED                                   NOT NULL,
     `concert_date_id` BIGINT UNSIGNED                                   NOT NULL,
     `seat_id`         BIGINT UNSIGNED                                   NOT NULL,
+
     `status`          ENUM ('PENDING','CONFIRMED','CANCELED','EXPIRED') NOT NULL COMMENT '예약 상태',
     `amount`          BIGINT UNSIGNED                                   NOT NULL COMMENT '결제 예정/실제 금액(원)',
     `hold_expires_at` DATETIME(6)                                                DEFAULT NULL COMMENT '홀드 만료 시각(UTC)',
     `confirmed_at`    DATETIME(6)                                                DEFAULT NULL COMMENT '확정 시각(UTC)',
     `canceled_at`     DATETIME(6)                                                DEFAULT NULL COMMENT '취소 시각(UTC)',
     `expired_at`      DATETIME(6)                                                DEFAULT NULL COMMENT '만료 처리 시각(UTC)',
+
+    `is_active`       TINYINT(1)                                         NOT NULL DEFAULT 0 COMMENT '좌석 점유 활성 플래그(홀드/확정=1, 취소/만료=0)',
+
     `version`         BIGINT UNSIGNED                                   NOT NULL DEFAULT 0 COMMENT '낙관적 락 버전',
     `created_at`      DATETIME(6)                                       NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updated_at`      DATETIME(6)                                       NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     `deleted_at`      DATETIME(6)                                                DEFAULT NULL,
+
     PRIMARY KEY (`id`),
-    KEY `idx_resv_user` (`user_id`),
-    KEY `idx_resv_concert` (`concert_id`),
-    KEY `idx_resv_date` (`concert_date_id`),
-    KEY `idx_resv_status` (`status`),
-    KEY `idx_resv_hold_exp` (`hold_expires_at`),
+
+    -- 조회/정렬용 인덱스
+    KEY `idx_resv_user`         (`user_id`),
+    KEY `idx_resv_concert`      (`concert_id`),
+    KEY `idx_resv_date`         (`concert_date_id`),
+    KEY `idx_resv_status`       (`status`),
+    KEY `idx_resv_hold_exp`     (`hold_expires_at`),
     KEY `idx_resv_confirmed_at` (`confirmed_at`),
-    KEY `idx_resv_canceled_at` (`canceled_at`),
-    KEY `idx_resv_expired_at` (`expired_at`),
-    CONSTRAINT `fk_resv_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-    CONSTRAINT `fk_resv_concert` FOREIGN KEY (`concert_id`) REFERENCES `concerts` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-    CONSTRAINT `fk_resv_date` FOREIGN KEY (`concert_date_id`) REFERENCES `concert_dates` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-    CONSTRAINT `fk_resv_seat` FOREIGN KEY (`seat_id`) REFERENCES `concert_seats` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    KEY `idx_resv_canceled_at`  (`canceled_at`),
+    KEY `idx_resv_expired_at`   (`expired_at`),
+
+    -- "현재 점유" 유니크 제약: seat_id에서 is_active=1은 1건만 허용
+    UNIQUE KEY `uk_resv_seat_active` (`seat_id`, `is_active`),
+
+    -- FK
+    CONSTRAINT `fk_resv_user`    FOREIGN KEY (`user_id`)         REFERENCES `users`         (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT `fk_resv_concert` FOREIGN KEY (`concert_id`)      REFERENCES `concerts`      (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT `fk_resv_date`    FOREIGN KEY (`concert_date_id`) REFERENCES `concert_dates` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT `fk_resv_seat`    FOREIGN KEY (`seat_id`)         REFERENCES `concert_seats` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+
+    -- 체크 제약
     CONSTRAINT `chk_reservations_amount_nonneg` CHECK (`amount` >= 0),
-    CONSTRAINT `chk_reservations_pending_hold` CHECK (`status` <> 'PENDING' OR `hold_expires_at` IS NOT NULL)
+    CONSTRAINT `chk_reservations_pending_hold`  CHECK (`status` <> 'PENDING' OR `hold_expires_at` IS NOT NULL)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT ='예약(홀드/확정/취소/만료)';
@@ -310,13 +324,14 @@ WHERE id IN (8, 10);
 -- reservations  — PENDING이면 hold_expires_at 필수
 INSERT INTO reservations
 (id, user_id, concert_id, concert_date_id, seat_id, status, amount, hold_expires_at, confirmed_at, canceled_at,
- expired_at, version)
-VALUES (1, 1, 1, 1, 1, 'CONFIRMED', 70000, NULL, CURRENT_TIMESTAMP(6), NULL, NULL, 0),
-       (2, 2, 1, 1, 2, 'PENDING', 70000, CURRENT_TIMESTAMP(6) + INTERVAL 15 MINUTE, NULL, NULL, NULL, 0),
-       (3, 3, 2, 3, 6, 'CONFIRMED', 90000, NULL, CURRENT_TIMESTAMP(6), NULL, NULL, 0),
-       (4, 4, 3, 4, 8, 'CANCELED', 80000, NULL, NULL, CURRENT_TIMESTAMP(6), NULL, 0),
-       (5, 5, 4, 5, 10, 'EXPIRED', 120000, NULL, NULL, NULL, CURRENT_TIMESTAMP(6), 0),
-       (6, 2, 5, 6, 11, 'PENDING', 50000, CURRENT_TIMESTAMP(6) + INTERVAL 10 MINUTE, NULL, NULL, NULL, 0);
+ expired_at, is_active, version)
+VALUES
+    (1, 1, 1, 1, 1, 'CONFIRMED', 70000, NULL, CURRENT_TIMESTAMP(6), NULL, NULL, 1, 0),
+    (2, 2, 1, 1, 2, 'PENDING',   70000, CURRENT_TIMESTAMP(6) + INTERVAL 15 MINUTE, NULL, NULL, NULL, 1, 0),
+    (3, 3, 2, 3, 6, 'CONFIRMED', 90000, NULL, CURRENT_TIMESTAMP(6), NULL, NULL, 1, 0),
+    (4, 4, 3, 4, 8, 'CANCELED',  80000, NULL, NULL, CURRENT_TIMESTAMP(6), NULL, 0, 0),
+    (5, 5, 4, 5,10, 'EXPIRED',  120000, NULL, NULL, NULL, CURRENT_TIMESTAMP(6), 0, 0),
+    (6, 2, 5, 6,11, 'PENDING',   50000, CURRENT_TIMESTAMP(6) + INTERVAL 10 MINUTE, NULL, NULL, NULL, 1, 0);
 
 -- payments — idempotency_key UNIQUE
 

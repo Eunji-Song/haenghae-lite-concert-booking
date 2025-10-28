@@ -1,10 +1,7 @@
 package kr.hhplus.be.server.reservation.infrastructure.persistence.jpa.mapper;
 
-import kr.hhplus.be.server.common.enums.ReservationStatus;
 import kr.hhplus.be.server.reservation.domain.model.Reservation;
 import kr.hhplus.be.server.reservation.infrastructure.persistence.jpa.entity.ReservationEntity;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 public final class ReservationJpaMapper {
     private ReservationJpaMapper(){}
@@ -23,6 +20,7 @@ public final class ReservationJpaMapper {
                 .confirmedAt(d.getConfirmedAt())
                 .canceledAt(d.getCanceledAt())
                 .expiredAt(d.getExpiredAt())
+                .isActive(d.isActive())
                 .version(d.getVersion() == null ? 0L : d.getVersion())
                 .build();
     }
@@ -41,6 +39,7 @@ public final class ReservationJpaMapper {
                 e.getConfirmedAt(),
                 e.getCanceledAt(),
                 e.getExpiredAt(),
+                e.isActive(),
                 e.getVersion(),
                 e.getCreatedAt(),
                 e.getUpdatedAt()

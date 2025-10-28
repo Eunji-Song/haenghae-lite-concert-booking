@@ -22,17 +22,12 @@ public class ConcertService {
 
     private final ConcertDateRepositoryAdapter dateAdapter;
     private final ConcertSeatRepositoryAdapter seatAdapter;
-    private final ReservationRepository reservationRepository; // 좌석 점유 가능 여부 판단용
+    private final ReservationRepository reservationRepository;
 
     public List<OpenDateResponse> getOpenDates(Long concertId) {
         List<ConcertDate> dates = dateAdapter.getOpenDates(concertId);
         return dates.stream()
-                .map(d -> new OpenDateResponse(
-                        d.getId(),
-                        d.getConcertId(),
-                        d.getEventDate(),
-                        d.isOpen()
-                ))
+                .map(d -> new OpenDateResponse(d.getId(), d.getConcertId(), d.getEventDate(), d.isOpen()))
                 .toList();
     }
 
@@ -40,11 +35,8 @@ public class ConcertService {
         List<ConcertSeat> seats = seatAdapter.findSeats(concertId, date);
         return seats.stream()
                 .map(s -> new SeatAvailabilityResponse(
-                        s.getId(),
-                        s.getSeatNo(),
-                        s.getPrice(),
-                        reservationRepository.isSeatOccupiable(s.getId()) ? SeatStatus.AVAILABLE
-                                : SeatStatus.HELD
+                        s.getId(), s.getSeatNo(), s.getPrice(),
+                        reservationRepository.isSeatOccupiable(s.getId()) ? SeatStatus.AVAILABLE : SeatStatus.HELD
                 ))
                 .toList();
     }

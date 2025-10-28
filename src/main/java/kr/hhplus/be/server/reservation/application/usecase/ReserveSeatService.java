@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.reservation.application.usecase;
 
-import kr.hhplus.be.server.common.enums.ReservationStatus;
 import kr.hhplus.be.server.common.exception.reservation.ReservationAccessDeniedException;
 import kr.hhplus.be.server.common.exception.reservation.SeatAlreadyReservedException;
 import kr.hhplus.be.server.identity.infrastructure.jpa.repository.UserJpaRepository;
@@ -30,44 +29,27 @@ public class ReserveSeatService implements ReserveSeatUseCase {
     @Override
     @Transactional
     public ReservationResponse reserve(ReserveSeatCommand cmd) {
-
-        // 사용자 검증
-        var userId = userRepo.findIdByUserUuid(cmd.userUuid())
+        Long userId = userRepo.findIdByUserUuid(cmd.userUuid())
                 .orElseThrow(ReservationAccessDeniedException::new);
 
-        // 공연 날짜 ID 조회 (DateResolver 사용)
         Long dateId = dateResolver.resolveDateId(cmd.concertId(), cmd.date());
-
-        //  좌석 ID 조회
         Long seatId = reservationRepository.resolveSeatId(cmd.concertId(), cmd.date(), cmd.seatNo());
 
-        // 가격
-        long amount = reservationRepository.findSeatPriceBySeatId(seatId);
+        // 1) 좌석 행 잠금
+        reservationRepository.lockSeat(seatId);
 
-        // 홀드 만료 시간
-        LocalDateTime holdUntil = LocalDateTime.now(clock).plusSeconds(cmd.holdSeconds());
-
-
-        // 좌석 점유 가능 여부 확인
+        // 2) 잠금 획득 후 점유 가능 재확인
         if (!reservationRepository.isSeatOccupiable(seatId)) {
             throw new SeatAlreadyReservedException();
         }
 
-        // 예약 생성 (PENDING 상태)
-        var pending = new Reservation(
-                null,
-                userId,
-                cmd.concertId(),
-                dateId,
-                seatId,
-                ReservationStatus.PENDING,
-                amount,
-                holdUntil,
-                null, null, null, null, null, null
-        );
+        long amount = reservationRepository.findSeatPriceBySeatId(seatId);
+        LocalDateTime holdUntil = LocalDateTime.now(clock).plusSeconds(cmd.holdSeconds());
 
-        var saved = reservationRepository.save(pending);
+        // 3) 활성 홀드로 생성 (isActive=true)
+        Reservation pending = Reservation.pending(userId, cmd.concertId(), dateId, seatId, amount, holdUntil);
 
+        var saved = reservationRepository.save(pending); // 유니크 위반 시 SeatAlreadyReservedException 변환
         return new ReservationResponse(saved.getId(), saved.getHoldExpiresAt());
     }
 }

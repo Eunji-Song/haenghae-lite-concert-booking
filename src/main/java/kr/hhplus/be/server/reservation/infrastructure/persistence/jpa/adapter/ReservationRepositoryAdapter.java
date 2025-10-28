@@ -12,6 +12,7 @@ import kr.hhplus.be.server.reservation.domain.model.Reservation;
 import kr.hhplus.be.server.reservation.infrastructure.persistence.jpa.mapper.ReservationJpaMapper;
 import kr.hhplus.be.server.reservation.infrastructure.persistence.jpa.repository.ReservationJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +22,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * 예약 저장, 조회, 좌석 점유 확인, 결제 후 확정 처리 담당
- */
 @Repository
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -34,7 +32,6 @@ public class ReservationRepositoryAdapter implements ReservationRepository {
     private final ConcertDateJpaRepository dateRepo;
     private final Clock clock;
 
-
     @Override
     public Optional<Reservation> findById(Long id) {
         return reservationRepo.findById(id).map(ReservationJpaMapper::toDomain);
@@ -43,24 +40,25 @@ public class ReservationRepositoryAdapter implements ReservationRepository {
     @Override
     public List<Reservation> findByUserId(Long userId) {
         return reservationRepo.findAllByUser_IdOrderByCreatedAtDesc(userId)
-                .stream()
-                .map(ReservationJpaMapper::toDomain)
-                .toList();
+                .stream().map(ReservationJpaMapper::toDomain).toList();
     }
 
     @Override
     @Transactional
     public Reservation save(Reservation reservation) {
-        var entity = ReservationJpaMapper.toEntity(reservation);
-        var saved = reservationRepo.save(entity);
-        return ReservationJpaMapper.toDomain(saved);
+        try {
+            var entity = ReservationJpaMapper.toEntity(reservation);
+            var saved = reservationRepo.save(entity);
+            return ReservationJpaMapper.toDomain(saved);
+        } catch (DataIntegrityViolationException e) {
+            // uk_resv_seat_active 위반 → 이미 누군가 활성 점유 중
+            throw new SeatAlreadyReservedException();
+        }
     }
-
-    // ========== [좌석 관련] ========== //
 
     @Override
     public boolean isSeatOccupiable(Long seatId) {
-        long count = reservationRepo.countActiveOccupancy(seatId, LocalDateTime.now(clock));
+        long count = reservationRepo.countActiveBySeatId(seatId);
         return count == 0;
     }
 
@@ -68,32 +66,21 @@ public class ReservationRepositoryAdapter implements ReservationRepository {
     public Long resolveSeatId(Long concertId, LocalDate eventDate, int seatNo) {
         var date = dateRepo.findByConcert_IdAndEventDate(concertId, eventDate)
                 .orElseThrow(ConcertDateNotFoundException::new);
-
         return seatRepo.findByConcertDate_IdAndSeatNo(date.getId(), seatNo)
                 .map(ConcertSeatEntity::getId)
                 .orElseThrow(SeatNotFoundException::new);
     }
 
-    // ========== [결제 확정 처리] ========== //
-
-    /**
-     * 결제 성공 후 예약 확정 처리 (PENDING → CONFIRMED)
-     */
     @Override
     @Transactional
     public void confirm(Long reservationId, Long userId) {
         LocalDateTime now = LocalDateTime.now(clock);
-
-        // 예약 조회
         var entity = reservationRepo.findById(reservationId)
                 .orElseThrow(ReservationNotFoundException::new);
 
-        // 접근 권한 검증
         if (!entity.getUser().getId().equals(userId)) {
             throw new ReservationAccessDeniedException();
         }
-
-        // 상태 검증
         if (entity.getStatus() != ReservationStatus.PENDING) {
             switch (entity.getStatus()) {
                 case CONFIRMED -> throw new ReservationAlreadyConfirmedException();
@@ -102,15 +89,19 @@ public class ReservationRepositoryAdapter implements ReservationRepository {
                 default -> throw new InvalidReservationStatusException();
             }
         }
-
-        // 상태 전이
-        entity.confirm(now);
+        entity.confirm(now);            // 상태 전이 + isActive=true 유지
         reservationRepo.save(entity);
     }
 
     @Override
+    @Transactional
+    public void lockSeat(Long seatId) {
+        seatRepo.lockById(seatId);
+    }
+
+    @Override
     public long findSeatPriceBySeatId(Long seatId) {
-        Long price = reservationRepo.findSeatPriceBySeatId(seatId);
+        Long price = seatRepo.findPriceById(seatId);
         if (price == null) {
             throw new SeatNotFoundException();
         }
