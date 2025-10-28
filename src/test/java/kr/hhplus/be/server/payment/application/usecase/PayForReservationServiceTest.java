@@ -48,7 +48,7 @@ class PayForReservationServiceTest {
 
         // 2) 예약 로딩/검증 OK
         ReservationForPayment res = new ReservationForPayment(reservationId, userId, concertId, amount);
-        when(reservationPort.getReservationForPayment(reservationId, userUuid, amount)).thenReturn(res);
+        when(reservationPort.getReservationForPayment(reservationId, userUuid)).thenReturn(res);
 
         // 3) 멱등키 미사용 기록
         when(paymentRepository.existsByIdempotencyKey(idem)).thenReturn(false);
@@ -81,7 +81,7 @@ class PayForReservationServiceTest {
 
         // 호출 검증
         verify(queuePort).validate(userUuid, "queue-token");
-        verify(reservationPort).getReservationForPayment(reservationId, userUuid, amount);
+        verify(reservationPort).getReservationForPayment(reservationId, userUuid);
         verify(paymentRepository).existsByIdempotencyKey(idem);
         verify(walletPort).debit(userId, amount, null, idem);
         verify(paymentRepository).save(any(Payment.class));
@@ -105,7 +105,7 @@ class PayForReservationServiceTest {
 
         // 예약 로딩/검증 OK
         ReservationForPayment res = new ReservationForPayment(reservationId, userId, concertId, amount);
-        when(reservationPort.getReservationForPayment(reservationId, userUuid, amount)).thenReturn(res);
+        when(reservationPort.getReservationForPayment(reservationId, userUuid)).thenReturn(res);
 
         // 멱등키 이미 존재
         when(paymentRepository.existsByIdempotencyKey(idem)).thenReturn(true);
@@ -124,7 +124,7 @@ class PayForReservationServiceTest {
 
         // 지갑/저장/확정/만료는 호출 안됨
         verify(queuePort).validate(userUuid, "queue-token");
-        verify(reservationPort).getReservationForPayment(reservationId, userUuid, amount);
+        verify(reservationPort).getReservationForPayment(reservationId, userUuid);
         verify(paymentRepository).existsByIdempotencyKey(idem);
 
         verifyNoInteractions(walletPort);

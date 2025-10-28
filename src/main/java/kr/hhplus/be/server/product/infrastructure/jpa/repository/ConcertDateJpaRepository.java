@@ -2,6 +2,8 @@ package kr.hhplus.be.server.product.infrastructure.jpa.repository;
 
 import kr.hhplus.be.server.product.infrastructure.jpa.entity.ConcertDateEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -41,5 +43,12 @@ public interface ConcertDateJpaRepository extends JpaRepository<ConcertDateEntit
     /**
      * 공연 ID와 날짜로 concert_date의 PK 조회
      */
-    Optional<Long> findIdByConcertIdAndEventDate(Long concertId, LocalDate eventDate);
+    @Query("select cd.id " +
+                  "from ConcertDateEntity cd " +
+                  "where cd.concert.id = :concertId and cd.eventDate = :eventDate")
+    Optional<Long> findIdByConcertIdAndEventDate(@Param("concertId") Long concertId,
+                                                 @Param("eventDate") LocalDate eventDate);
+
+    @Query("select cd from ConcertDateEntity cd join fetch cd.concert where cd.id = :id")
+    Optional<ConcertDateEntity> findWithConcert(@Param("id") Long id);
 }

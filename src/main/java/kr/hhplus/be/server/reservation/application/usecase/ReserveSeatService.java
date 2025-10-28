@@ -41,16 +41,17 @@ public class ReserveSeatService implements ReserveSeatUseCase {
         //  좌석 ID 조회
         Long seatId = reservationRepository.resolveSeatId(cmd.concertId(), cmd.date(), cmd.seatNo());
 
+        // 가격
+        long amount = reservationRepository.findSeatPriceBySeatId(seatId);
+
+        // 홀드 만료 시간
+        LocalDateTime holdUntil = LocalDateTime.now(clock).plusSeconds(cmd.holdSeconds());
+
+
         // 좌석 점유 가능 여부 확인
         if (!reservationRepository.isSeatOccupiable(seatId)) {
             throw new SeatAlreadyReservedException();
         }
-
-        // 금액 (좌석 가격) — 추후 개선 가능
-        long amount = 0L;
-
-        // 홀드 만료 시간 계산
-        LocalDateTime holdUntil = LocalDateTime.now(clock).plusSeconds(cmd.holdSeconds());
 
         // 예약 생성 (PENDING 상태)
         var pending = new Reservation(
@@ -62,7 +63,7 @@ public class ReserveSeatService implements ReserveSeatUseCase {
                 ReservationStatus.PENDING,
                 amount,
                 holdUntil,
-                null, null, null, null, null
+                null, null, null, null, null, null
         );
 
         var saved = reservationRepository.save(pending);

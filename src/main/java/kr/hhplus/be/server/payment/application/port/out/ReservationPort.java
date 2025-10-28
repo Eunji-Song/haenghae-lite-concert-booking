@@ -11,7 +11,7 @@ public interface ReservationPort {
      * 결제 전에 예약을 로드하고 금액/상태/소유자(유저) 검증까지 수행.
      * 검증 실패 시 예외를 던진다.
      */
-    ReservationForPayment getReservationForPayment(Long reservationId, String userUuid, long amount);
+    ReservationForPayment getReservationForPayment(Long reservationId, String userUuid);
 
 
     /**

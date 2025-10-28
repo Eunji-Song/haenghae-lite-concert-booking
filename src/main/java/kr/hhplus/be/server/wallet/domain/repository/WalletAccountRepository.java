@@ -8,4 +8,6 @@ public interface WalletAccountRepository {
     Optional<WalletAccount> findByUserId(Long userId);
     WalletAccount save(WalletAccount account);
     WalletAccount createIfNotExists(Long userId);
+
+
 }

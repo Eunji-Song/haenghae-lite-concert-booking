@@ -28,7 +28,7 @@ public class PayForReservationService implements PayForReservationUseCase {
 
         // 2) 예약 로딩/검증
         ReservationForPayment res = reservationPort.getReservationForPayment(
-                cmd.reservationId(), cmd.userUuid(), cmd.amount()
+                cmd.reservationId(), cmd.userUuid()
         );
 
         // 3) 멱등키 확인

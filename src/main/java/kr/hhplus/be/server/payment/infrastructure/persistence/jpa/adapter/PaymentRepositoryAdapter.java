@@ -7,7 +7,7 @@ import kr.hhplus.be.server.payment.application.port.out.PaymentRepository;
 import kr.hhplus.be.server.payment.domain.model.Payment;
 import kr.hhplus.be.server.payment.infrastructure.persistence.jpa.entity.PaymentEntity;
 import kr.hhplus.be.server.payment.infrastructure.persistence.jpa.mapper.PaymentJpaMapper;
-import kr.hhplus.be.server.payment.infrastructure.persistence.jpa.repository.PaymentEntityRepository;
+import kr.hhplus.be.server.payment.infrastructure.persistence.jpa.repository.PaymentJpaRepository;
 import kr.hhplus.be.server.reservation.infrastructure.persistence.jpa.entity.ReservationEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -20,7 +20,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class PaymentRepositoryAdapter implements PaymentRepository {
 
-    private final PaymentEntityRepository jpa;
+    private final PaymentJpaRepository jpa;
 
     @PersistenceContext
     private EntityManager em;

@@ -52,8 +52,9 @@ public class CancelReservationService implements CancelReservationUseCase {
                 reservation.getAmount(),
                 reservation.getHoldExpiresAt(),
                 reservation.getConfirmedAt(),
-                LocalDateTime.now(clock),  // canceledAt
+                LocalDateTime.now(clock),
                 reservation.getExpiredAt(),
+                null,
                 reservation.getCreatedAt(),
                 reservation.getUpdatedAt()
         );

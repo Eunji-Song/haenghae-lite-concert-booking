@@ -42,6 +42,7 @@ class GetReservationServiceTest {
                 ReservationStatus.PENDING, 30000L,
                 LocalDateTime.now().plusMinutes(5),
                 null, null, null,
+                null,
                 LocalDateTime.now().minusMinutes(1),
                 LocalDateTime.now().minusMinutes(1)
         );
@@ -74,8 +75,8 @@ class GetReservationServiceTest {
     @Test
     void getMy_success() {
         when(userRepo.findIdByUserUuid("u")).thenReturn(java.util.Optional.of(1L));
-        var r1 = new Reservation(1L, 1L, 10L, 100L, 1000L, ReservationStatus.PENDING, 1000L, null, null, null, null, LocalDateTime.now(), LocalDateTime.now());
-        var r2 = new Reservation(2L, 1L, 11L, 101L, 1001L, ReservationStatus.CANCELED, 2000L, null, null, LocalDateTime.now(), null, LocalDateTime.now(), LocalDateTime.now());
+        var r1 = new Reservation(1L, 1L, 10L, 100L, 1000L, ReservationStatus.PENDING, 1000L, null, null, null, null, null, LocalDateTime.now(), LocalDateTime.now());
+        var r2 = new Reservation(2L, 1L, 11L, 101L, 1001L, ReservationStatus.CANCELED, 2000L, null, null, LocalDateTime.now(), null, null, LocalDateTime.now(), LocalDateTime.now());
         when(reservationRepository.findByUserId(1L)).thenReturn(List.of(r1, r2));
 
         var list = sut.getMy("u");

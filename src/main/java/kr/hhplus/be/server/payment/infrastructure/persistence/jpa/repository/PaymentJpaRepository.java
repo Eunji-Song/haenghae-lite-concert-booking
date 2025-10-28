@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface PaymentEntityRepository extends JpaRepository<PaymentEntity, Long> {
+public interface PaymentJpaRepository extends JpaRepository<PaymentEntity, Long> {
     boolean existsByIdempotencyKey(String idempotencyKey);
     Optional<PaymentEntity> findByReservation_IdAndStatus(Long reservationId, PaymentStatus status);
 }

@@ -47,6 +47,7 @@ class CancelReservationServiceTest {
                 ReservationStatus.PENDING, 50000L,
                 LocalDateTime.now(clock).plusMinutes(10),
                 null, null, null,
+                null,
                 LocalDateTime.now(clock).minusMinutes(1),
                 LocalDateTime.now(clock).minusMinutes(1)
         );
@@ -90,6 +91,7 @@ class CancelReservationServiceTest {
                 1L, 999L, 10L, 20L, 30L,
                 ReservationStatus.PENDING, 1000L,
                 null, null, null, null,
+                null,
                 LocalDateTime.now(), LocalDateTime.now()
         );
         when(reservationRepository.findById(1L)).thenReturn(java.util.Optional.of(otherOwnerRes));

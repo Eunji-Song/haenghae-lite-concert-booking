@@ -17,6 +17,8 @@ public interface ReservationRepository {
 
     Long resolveSeatId(Long concertId, LocalDate eventDate, int seatNo);
 
+    long findSeatPriceBySeatId(Long seatId);
+
     /** 결제 성공 후 예약 확정 처리 */
     void confirm(Long reservationId, Long userId);
 }

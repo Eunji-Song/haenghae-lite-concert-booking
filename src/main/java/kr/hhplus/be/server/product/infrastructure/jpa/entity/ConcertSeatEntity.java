@@ -46,7 +46,15 @@ public class ConcertSeatEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     @Comment("좌석 상태(AVAILABLE/HELD/CONFIRMED)")
+    @Builder.Default
     private SeatStatus status = SeatStatus.AVAILABLE;
+
+    @PrePersist
+    private void prePersist() {
+        if (this.status == null) {
+            this.status = SeatStatus.AVAILABLE;
+        }
+    }
 
     /** 좌석 상태 변경 (예약 확정 / 임시 배정 / 해제) */
     public void changeStatus(SeatStatus newStatus) {

@@ -42,6 +42,7 @@ public class WalletService {
         User user = userRepository.findByUuid(userUuid)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userUuid));
 
+
         // 멱등 처리
         if (idempotencyKeyRepository.exists(idempotencyKey)) {
             WalletAccount acct = walletAccountRepository.findByUserId(user.getId())

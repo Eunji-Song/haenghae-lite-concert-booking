@@ -32,23 +32,36 @@ public class WalletAccountRepositoryAdapter implements WalletAccountRepository {
     @Override
     @Transactional
     public WalletAccount save(WalletAccount account) {
-        var e = WalletJpaMapper.toEntity(account);
-        e = e.toBuilder()
-                .user(em.getReference(UserEntity.class, account.getUserId()))
-                .build();
-        var saved = jpa.save(e);
-        return WalletJpaMapper.toDomain(saved);
+        WalletAccountEntity wallet = jpa.findById(account.getUserId())
+                .orElseGet(() -> {
+                    UserEntity ref = em.getReference(UserEntity.class, account.getUserId());
+                    return jpa.saveAndFlush(WalletAccountEntity.create(ref));
+                });
+
+        wallet.setBalance(account.getBalance());
+
+        return WalletJpaMapper.toDomain(wallet);
     }
 
     @Override
     @Transactional
     public WalletAccount createIfNotExists(Long userId) {
-        return jpa.findByUserId(userId)
-                .map(WalletJpaMapper::toDomain)
+        // 1) 빠른 경로: 이미 있으면 그대로 반환
+        var existing = jpa.findByUserId(userId);
+        if (existing.isPresent()) return WalletJpaMapper.toDomain(existing.get());
+
+        // 2) 없으면 UPSERT로 "있으면 패스/없으면 생성"
+        jpa.upsertBlankAccount(userId);
+
+        // 3) 다시 조회해서 도메인으로 반환
+        var justCreated = jpa.findByUserId(userId)
                 .orElseGet(() -> {
-                    UserEntity userRef = em.getReference(UserEntity.class, userId);
-                    WalletAccountEntity entity = WalletAccountEntity.create(userRef);
-                    return WalletJpaMapper.toDomain(jpa.save(entity));
+                    // 이 경우는 거의 없지만, 방어적으로 한번 더 보장
+                    UserEntity ref = em.getReference(UserEntity.class, userId);
+                    var e = WalletAccountEntity.create(ref);
+                    return jpa.saveAndFlush(e);
                 });
+
+        return WalletJpaMapper.toDomain(justCreated);
     }
 }

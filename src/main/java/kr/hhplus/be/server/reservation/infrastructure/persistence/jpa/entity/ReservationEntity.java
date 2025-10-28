@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(toBuilder = true)
-@SQLDelete(sql = "UPDATE reservations SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLDelete(sql = "UPDATE reservations SET deleted_at = CURRENT_TIMESTAMP(6) WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class ReservationEntity extends BaseEntity {
 
@@ -41,34 +41,45 @@ public class ReservationEntity extends BaseEntity {
     @Comment("PK")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "fk_resv_user"))
+    // === FK primitive fields (실제 INSERT/UPDATE는 이 값들이 들어감) ===
+    @Column(name = "user_id", nullable = false)
     @Comment("FK: users.id")
+    private Long userId;
+
+    @Column(name = "concert_id", nullable = false)
+    @Comment("FK: concerts.id")
+    private Long concertId;
+
+    @Column(name = "concert_date_id", nullable = false)
+    @Comment("FK: concert_dates.id")
+    private Long concertDateId;
+
+    @Column(name = "seat_id", nullable = false)
+    @Comment("FK: concert_seats.id")
+    private Long seatId;
+
+    // === 읽기 전용 연관관계 (조회 편의용) ===
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false,
+            foreignKey = @ForeignKey(name = "fk_resv_user"))
     private UserEntity user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "concert_id",
-            nullable = false,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "concert_id", insertable = false, updatable = false,
             foreignKey = @ForeignKey(name = "fk_resv_concert"))
-    @Comment("FK: concerts.id")
     private ConcertEntity concert;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "concert_date_id",
-            nullable = false,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "concert_date_id", insertable = false, updatable = false,
             foreignKey = @ForeignKey(name = "fk_resv_date"))
-    @Comment("FK: concert_dates.id")
     private ConcertDateEntity concertDate;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "seat_id",
-            nullable = false,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seat_id", insertable = false, updatable = false,
             foreignKey = @ForeignKey(name = "fk_resv_seat"))
-    @Comment("FK: concert_seats.id")
     private ConcertSeatEntity seat;
 
+    // === 상태/타임스탬프 ===
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 10)
     @Comment("예약 상태(PENDING, CONFIRMED, CANCELED, EXPIRED)")
@@ -99,7 +110,6 @@ public class ReservationEntity extends BaseEntity {
     @Comment("낙관적 락 버전")
     private Long version;
 
-
     public void holdUntil(LocalDateTime expiresAt, long amount) {
         if (status != ReservationStatus.PENDING) {
             throw new IllegalStateException("예약이 PENDING 상태일 때만 홀드 설정 가능");
@@ -121,9 +131,6 @@ public class ReservationEntity extends BaseEntity {
     }
 
     public void cancel(LocalDateTime now) {
-        if (status == ReservationStatus.CONFIRMED) {
-            // 정책에 따라 확정 후 취소 허용/불가 결정. 여기서는 허용한다고 가정.
-        }
         if (status == ReservationStatus.CANCELED) return;
         this.status = ReservationStatus.CANCELED;
         this.canceledAt = now;
