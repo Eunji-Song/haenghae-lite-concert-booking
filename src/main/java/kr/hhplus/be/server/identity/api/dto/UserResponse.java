@@ -13,6 +13,6 @@ public record UserResponse(
     }
 
     public static UserResponse from(User user) {
-        return new UserResponse(user.getUserUuid(), user.getEmail(), user.getName());
+        return new UserResponse(user.userUuid(), user.email(), user.name());
     }
 }

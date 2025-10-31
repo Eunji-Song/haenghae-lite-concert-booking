@@ -52,7 +52,7 @@ public class ReservationRepositoryAdapter implements ReservationRepository {
             return ReservationJpaMapper.toDomain(saved);
         } catch (DataIntegrityViolationException e) {
             // uk_resv_seat_active 위반 → 이미 누군가 활성 점유 중
-            throw new SeatAlreadyReservedException();
+            throw new SeatAlreadyReservedException(e.getMessage());
         }
     }
 

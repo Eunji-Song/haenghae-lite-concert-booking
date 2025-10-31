@@ -24,7 +24,7 @@ class UserServiceTest {
         when(userRepository.findByUuid("uuid-1")).thenReturn(Optional.of(user));
 
         var found = userService.getUser("uuid-1");
-        assertThat(found.getEmail()).isEqualTo("a@a.com");
+        assertThat(found.email()).isEqualTo("a@a.com");
     }
 
     @Test @DisplayName("userUuid로 조회 실패 → 404")
@@ -39,6 +39,6 @@ class UserServiceTest {
         when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 
         var found = userService.getUser(10L);
-        assertThat(found.getUserUuid()).isEqualTo("uuid-1");
+        assertThat(found.userUuid()).isEqualTo("uuid-1");
     }
 }

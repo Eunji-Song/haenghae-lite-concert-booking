@@ -29,10 +29,10 @@ public class WalletService {
         User user = userRepository.findByUuid(userUuid)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userUuid));
 
-        WalletAccount account = walletAccountRepository.findByUserId(user.getId())
-                .orElseGet(() -> walletAccountRepository.createIfNotExists(user.getId()));
+        WalletAccount account = walletAccountRepository.findByUserId(user.id())
+                .orElseGet(() -> walletAccountRepository.createIfNotExists(user.id()));
 
-        LocalDateTime last = walletTransactionRepository.findLatestCreatedAtByUserId(user.getId())
+        LocalDateTime last = walletTransactionRepository.findLatestCreatedAtByUserId(user.id())
                 .orElse(account.getCreatedAt());
 
         return new WalletBalanceResponse(account.getBalance(), "KRW", last);
@@ -45,25 +45,25 @@ public class WalletService {
 
         // 멱등 처리
         if (idempotencyKeyRepository.exists(idempotencyKey)) {
-            WalletAccount acct = walletAccountRepository.findByUserId(user.getId())
-                    .orElseGet(() -> walletAccountRepository.createIfNotExists(user.getId()));
-            LocalDateTime last = walletTransactionRepository.findLatestCreatedAtByUserId(user.getId())
+            WalletAccount acct = walletAccountRepository.findByUserId(user.id())
+                    .orElseGet(() -> walletAccountRepository.createIfNotExists(user.id()));
+            LocalDateTime last = walletTransactionRepository.findLatestCreatedAtByUserId(user.id())
                     .orElse(acct.getCreatedAt());
             return new WalletBalanceResponse(acct.getBalance(), "KRW", last);
         }
 
-        WalletAccount account = walletAccountRepository.findByUserId(user.getId())
-                .orElseGet(() -> walletAccountRepository.createIfNotExists(user.getId()));
+        WalletAccount account = walletAccountRepository.findByUserId(user.id())
+                .orElseGet(() -> walletAccountRepository.createIfNotExists(user.id()));
 
         account.charge(amount);
         walletAccountRepository.save(account);
 
-        WalletTransaction txn = WalletTransaction.charge(user.getId(), amount, idempotencyKey);
+        WalletTransaction txn = WalletTransaction.charge(user.id(), amount, idempotencyKey);
         walletTransactionRepository.save(txn);
 
         idempotencyKeyRepository.save(idempotencyKey);
 
-        LocalDateTime last = walletTransactionRepository.findLatestCreatedAtByUserId(user.getId())
+        LocalDateTime last = walletTransactionRepository.findLatestCreatedAtByUserId(user.id())
                 .orElse(account.getCreatedAt());
 
         return new WalletBalanceResponse(account.getBalance(), "KRW", last);

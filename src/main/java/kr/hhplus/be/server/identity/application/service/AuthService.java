@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -54,21 +53,21 @@ public class AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(LoginFailedException::new);
 
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+        if (!passwordEncoder.matches(request.password(), user.passwordHash())) {
             throw new LoginFailedException();
         }
 
         // 토큰 발급
-        String uuid = user.getUserUuid();
+        String uuid = user.userUuid();
 
-        String accessToken = jwtTokenProvider.createAccessToken(uuid, Map.of("email", user.getEmail()));
+        String accessToken = jwtTokenProvider.createAccessToken(uuid, Map.of("email", user.email()));
         String refreshToken = jwtTokenProvider.createRefreshToken(uuid);
 
         int accessTtl = (int) jwtTokenProvider.getAccessTokenExpiresIn();
         int refreshTtl = (int) jwtTokenProvider.getRefreshTokenExpiresIn();
 
         LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(refreshTtl);
-        userTokenRepository.replace(user.getUserUuid(), refreshToken, expiresAt);
+        userTokenRepository.replace(user.userUuid(), refreshToken, expiresAt);
 
         return new UserToken(accessToken, accessTtl, refreshToken, refreshTtl);
     }

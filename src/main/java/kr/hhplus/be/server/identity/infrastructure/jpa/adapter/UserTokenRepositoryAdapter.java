@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class UserTokenRepositoryAdapter implements UserTokenRepository {
 
     private final UserJpaRepository userJpaRepository;
