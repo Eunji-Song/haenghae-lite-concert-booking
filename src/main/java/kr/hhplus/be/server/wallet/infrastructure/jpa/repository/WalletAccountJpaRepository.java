@@ -7,22 +7,30 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 public interface WalletAccountJpaRepository extends JpaRepository<WalletAccountEntity, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-
     Optional<WalletAccountEntity> findByUserId(Long userId);
 
-    @Query("select w from WalletAccountEntity w where w.userId = :userId")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Query("""
+            SELECT w 
+              FROM WalletAccountEntity w 
+             WHERE w.userId = :userId
+            """)
     Optional<WalletAccountEntity> findByIdForUpdate(@Param("userId") Long userId);
 
     @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
-    @Query("select w from WalletAccountEntity w where w.userId = :userId")
+    @Query("""
+            SELECT w 
+              FROM WalletAccountEntity w 
+             WHERE w.userId = :userId
+            """)
     Optional<WalletAccountEntity> findByIdForUpdateOptimistic(@Param("userId") Long userId);
-
 
     @Modifying
     @Query(value = """
@@ -30,6 +38,5 @@ public interface WalletAccountJpaRepository extends JpaRepository<WalletAccountE
             VALUES (:userId, 0, CURRENT_TIMESTAMP(6), 0)
             ON DUPLICATE KEY UPDATE user_id = user_id
             """, nativeQuery = true)
-    int upsertBlankAccount(@Param("userId") Long userId);
-
+    void upsertBlankAccount(@Param("userId") Long userId);
 }
