@@ -11,7 +11,6 @@ public enum ErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN, "AUTH004", "접근 권한이 없습니다"),
     LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH005", "이메일 또는 비밀번호가 올바르지 않습니다"),
 
-
     // 사용자 관련
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER001", "이미 가입된 이메일입니다"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER002", "사용자를 찾을 수 없습니다"),
@@ -27,6 +26,7 @@ public enum ErrorCode {
     CONCERT_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "CONCERT001", "예약할 수 없는 콘서트입니다"),
     CONCERT_NOT_FOUND(HttpStatus.NOT_FOUND, "CONCERT002", "콘서트를 찾을 수 없습니다"),
     CONCERT_DATE_NOT_OPEN(HttpStatus.BAD_REQUEST, "CONCERT003", "해당 날짜는 예약이 오픈되지 않았습니다"),
+    CONCERT_DATE_NOT_FOUND(HttpStatus.NOT_FOUND, "CONCERT004", "공연 날짜를 찾을 수 없습니다"),
 
     // 좌석/예약 관련
     SEAT_NOT_AVAILABLE(HttpStatus.CONFLICT, "SEAT001", "예약할 수 없는 좌석입니다"),
@@ -41,7 +41,6 @@ public enum ErrorCode {
     RESERVATION_HOLD_EXPIRED(HttpStatus.GONE, "RESV006", "예약 홀드 시간이 만료되었습니다"),
     RESERVATION_ACCESS_DENIED(HttpStatus.FORBIDDEN, "RESV007", "예약에 대한 접근 권한이 없습니다"),
 
-
     // 결제 관련
     INSUFFICIENT_BALANCE(HttpStatus.PAYMENT_REQUIRED, "PAY001", "잔액이 부족합니다"),
     PAYMENT_FAILED(HttpStatus.BAD_REQUEST, "PAY002", "결제에 실패했습니다"),
@@ -51,7 +50,6 @@ public enum ErrorCode {
     // 대기열 관련
     QUEUE_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "QUEUE001", "유효하지 않은 대기열 토큰입니다"),
     QUEUE_NOT_ACTIVE(HttpStatus.FORBIDDEN, "QUEUE002", "대기열이 활성화되지 않았습니다"),
-
     ALREADY_IN_QUEUE(HttpStatus.CONFLICT, "QUEUE003", "이미 대기열에 등록된 사용자입니다"),
     INVALID_QUEUE_TOKEN(HttpStatus.UNAUTHORIZED, "QUEUE004", "대기열 토큰이 유효하지 않습니다"),
     QUEUE_EXPIRED(HttpStatus.GONE, "QUEUE005", "대기열 토큰이 만료되었습니다"),

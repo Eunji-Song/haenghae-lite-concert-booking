@@ -7,4 +7,8 @@ public class InvalidQueueTokenException extends BaseException {
     public InvalidQueueTokenException() {
         super(ErrorCode.INVALID_QUEUE_TOKEN);
     }
+
+    public InvalidQueueTokenException(String message) {
+        super(ErrorCode.INVALID_QUEUE_TOKEN, message);
+    }
 }
