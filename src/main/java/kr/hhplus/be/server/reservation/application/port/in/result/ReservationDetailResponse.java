@@ -1,8 +1,5 @@
 package kr.hhplus.be.server.reservation.application.port.in.result;
 
-import kr.hhplus.be.server.common.enums.ReservationStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 public record ReservationDetailResponse(
         Long reservationId,

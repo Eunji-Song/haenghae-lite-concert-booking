@@ -30,7 +30,7 @@ public class ReservationController {
     @Operation(summary = "좌석 예약(홀드)")
     @PostMapping
     public ResponseEntity<ReservationResponse> reserveSeat(
-            @Parameter(hidden = true)  @CurrentUserUuid String userUuid,
+            @Parameter(hidden = true) @CurrentUserUuid String userUuid,
             @RequestBody ReserveSeatRequest request,
             @RequestHeader("X-Queue-Token") String queueToken
     ) {
