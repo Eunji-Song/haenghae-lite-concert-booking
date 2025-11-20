@@ -44,7 +44,7 @@ public class ReservationController {
     }
 
     @Operation(summary = "예약 취소")
-    @PostMapping("/{reservationId}/cancel")
+    @DeleteMapping("/{reservationId}/cancel")
     public ResponseEntity<Void> cancel(
             @CurrentUserUuid String userUuid,
             @PathVariable Long reservationId
@@ -63,7 +63,7 @@ public class ReservationController {
     }
 
     @Operation(summary = "내 예약 목록")
-    @GetMapping("/me")
+    @GetMapping()
     public ResponseEntity<java.util.List<ReservationDetailResponse>> getMy(
             @CurrentUserUuid String userUuid
     ) {

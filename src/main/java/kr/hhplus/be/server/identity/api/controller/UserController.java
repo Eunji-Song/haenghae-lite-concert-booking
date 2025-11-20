@@ -27,13 +27,13 @@ public class UserController {
     @GetMapping("/{userUuid}")
     public ResponseEntity<UserResponse> getUser(@PathVariable @NotBlank String userUuid) {
         User user = userService.getUser(userUuid);
-        return ResponseEntity.ok(UserResponse.of(user.getUserUuid(), user.getEmail(), user.getName()));
+        return ResponseEntity.ok(UserResponse.of(user.userUuid(), user.email(), user.name()));
     }
 
     @Operation(summary = "내 정보 조회")
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me(@CurrentUserUuid String userUuid) {
         User user = userService.getUser(userUuid);
-        return ResponseEntity.ok(UserResponse.of(user.getUserUuid(), user.getEmail(), user.getName()));
+        return ResponseEntity.ok(UserResponse.of(user.userUuid(), user.email(), user.name()));
     }
 }

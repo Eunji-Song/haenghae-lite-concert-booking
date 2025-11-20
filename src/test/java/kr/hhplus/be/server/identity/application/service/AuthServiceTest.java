@@ -44,7 +44,7 @@ class AuthServiceTest {
 
         var created = authService.createUser(req);
 
-        assertThat(created.getEmail()).isEqualTo("new@hhplus.com");
+        assertThat(created.email()).isEqualTo("new@hhplus.com");
         verify(userRepository).save(any(User.class));
     }
 
@@ -61,9 +61,9 @@ class AuthServiceTest {
         var user = new User("u-uuid", req.email(), "유저", "$2a$hash");
 
         when(userRepository.findByEmail(req.email())).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(req.password(), user.getPasswordHash())).thenReturn(true);
-        when(jwtTokenProvider.createAccessToken(eq(user.getUserUuid()), anyMap())).thenReturn("access.jwt");
-        when(jwtTokenProvider.createRefreshToken(user.getUserUuid())).thenReturn("refresh.jwt");
+        when(passwordEncoder.matches(req.password(), user.passwordHash())).thenReturn(true);
+        when(jwtTokenProvider.createAccessToken(eq(user.userUuid()), anyMap())).thenReturn("access.jwt");
+        when(jwtTokenProvider.createRefreshToken(user.userUuid())).thenReturn("refresh.jwt");
         when(jwtTokenProvider.getAccessTokenExpiresIn()).thenReturn(1800);
         when(jwtTokenProvider.getRefreshTokenExpiresIn()).thenReturn(1209600);
 
@@ -85,7 +85,7 @@ class AuthServiceTest {
         var req = new LoginRequest("user@hhplus.com", "wrong");
         var user = Users.domainWith("u-1", req.email());
         when(userRepository.findByEmail(req.email())).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(req.password(), user.getPasswordHash())).thenReturn(false);
+        when(passwordEncoder.matches(req.password(), user.passwordHash())).thenReturn(false);
         assertThatThrownBy(() -> authService.login(req)).isInstanceOf(LoginFailedException.class);
     }
 }

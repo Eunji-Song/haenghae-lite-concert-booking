@@ -1,25 +1,18 @@
 package kr.hhplus.be.server.identity.domain.model;
 
 
-import lombok.Getter;
-
-@Getter
-public class User {
-    private final Long id;
-    private final String userUuid;
-    private final String email;
-    private final String name;
-    private final String passwordHash;
-
+public record User(
+        Long id,
+        String userUuid,
+        String email,
+        String name,
+        String passwordHash
+) {
+    /**
+     * 신규 사용자 생성 시 사용하는 편의 생성자
+     * (id는 null로 초기화)
+     */
     public User(String userUuid, String email, String name, String passwordHash) {
         this(null, userUuid, email, name, passwordHash);
-    }
-
-    public User(Long id, String userUuid, String email, String name, String passwordHash) {
-        this.id = id;
-        this.userUuid = userUuid;
-        this.email = email;
-        this.name = name;
-        this.passwordHash = passwordHash;
     }
 }

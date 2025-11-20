@@ -22,11 +22,11 @@ public final class UserJpaMapper {
     public static UserEntity toEntity(User d) {
         if (d == null) return null;
         return UserEntity.builder()
-                .id(d.getId())
-                .userUuid(d.getUserUuid())
-                .email(d.getEmail())
-                .name(d.getName())
-                .password(d.getPasswordHash())
+                .id(d.id())
+                .userUuid(d.userUuid())
+                .email(d.email())
+                .name(d.name())
+                .password(d.passwordHash())
                 .build();
     }
 }
