@@ -11,4 +11,6 @@ public interface PaymentRepository {
     boolean existsByIdempotencyKey(String idempotencyKey);
     Payment save(Payment payment);
     Optional<Payment> findSucceededByReservationId(Long reservationId);
+
+    Optional<Payment> findById(Long paymentId);
 }
