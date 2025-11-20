@@ -1,7 +1,5 @@
 package kr.hhplus.be.server.payment.integration;
 
-
-import kr.hhplus.be.server.common.enums.QueueStatus;
 import kr.hhplus.be.server.common.enums.ReservationStatus;
 import kr.hhplus.be.server.common.integration.BaseIntegrationTest;
 import kr.hhplus.be.server.identity.infrastructure.jpa.entity.UserEntity;
@@ -29,7 +27,6 @@ import kr.hhplus.be.server.wallet.infrastructure.jpa.entity.WalletAccountEntity;
 import kr.hhplus.be.server.wallet.infrastructure.jpa.repository.WalletAccountJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.ILoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

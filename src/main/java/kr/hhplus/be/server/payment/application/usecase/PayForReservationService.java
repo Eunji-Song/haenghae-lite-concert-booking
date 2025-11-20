@@ -7,13 +7,14 @@ import kr.hhplus.be.server.payment.application.port.out.*;
 import kr.hhplus.be.server.payment.domain.model.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class PayForReservationService implements PayForReservationUseCase {
 
     private final QueuePort queuePort;

@@ -2,11 +2,9 @@ package kr.hhplus.be.server.wallet.infrastructure.jpa.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import kr.hhplus.be.server.wallet.infrastructure.jpa.entity.WalletAccountEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +20,7 @@ public interface WalletAccountJpaRepository extends JpaRepository<WalletAccountE
               FROM WalletAccountEntity w 
              WHERE w.userId = :userId
             """)
+    @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "5000"))
     Optional<WalletAccountEntity> findByIdForUpdate(@Param("userId") Long userId);
 
     @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
@@ -30,6 +29,7 @@ public interface WalletAccountJpaRepository extends JpaRepository<WalletAccountE
               FROM WalletAccountEntity w 
              WHERE w.userId = :userId
             """)
+    @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "5000"))
     Optional<WalletAccountEntity> findByIdForUpdateOptimistic(@Param("userId") Long userId);
 
     @Modifying

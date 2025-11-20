@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.wallet.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.hhplus.be.server.identity.domain.model.User;
 import kr.hhplus.be.server.identity.domain.repository.UserRepository;
 import kr.hhplus.be.server.wallet.api.dto.WalletBalanceResponse;
@@ -11,12 +10,13 @@ import kr.hhplus.be.server.wallet.domain.repository.WalletAccountRepository;
 import kr.hhplus.be.server.wallet.domain.repository.WalletTransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class WalletService {
 
     private final UserRepository userRepository;
@@ -24,7 +24,6 @@ public class WalletService {
     private final WalletTransactionRepository walletTransactionRepository;
     private final IdempotencyKeyRepository idempotencyKeyRepository;
 
-    @Transactional(Transactional.TxType.SUPPORTS)
     public WalletBalanceResponse getBalance(String userUuid) {
         User user = userRepository.findByUuid(userUuid)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userUuid));
@@ -38,6 +37,7 @@ public class WalletService {
         return new WalletBalanceResponse(account.getBalance(), "KRW", last);
     }
 
+    @Transactional
     public WalletBalanceResponse charge(String userUuid, long amount, String idempotencyKey) {
         User user = userRepository.findByUuid(userUuid)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userUuid));
