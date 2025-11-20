@@ -12,10 +12,10 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationEntit
 
     // 좌석의 "현재 활성 점유" 수 → 0이면 점유 가능
     @Query("""
-           select count(r)
-             from ReservationEntity r
-            where r.seatId = :seatId
-              and r.isActive = true
+           SELECT COUNT(r)
+             FROM ReservationEntity r
+            WHERE r.seatId = :seatId
+              AND r.isActive = true
            """)
     long countActiveBySeatId(@Param("seatId") Long seatId);
 
@@ -24,13 +24,13 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationEntit
     // 단건 강제 만료 (선택 API): PENDING -> EXPIRED + isActive=false
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
-           update ReservationEntity r
-              set r.status = :expired,
+           UPDATE ReservationEntity r
+              SET r.status = :expired,
                   r.expiredAt = :now,
                   r.isActive = false
-            where r.id = :id
-              and r.status = 'PENDING'
-              and r.isActive = true
+            WHERE r.id = :id
+              AND r.status = 'PENDING'
+              AND r.isActive = true
            """)
     int forceExpire(@Param("id") Long id,
                     @Param("expired") ReservationStatus expired,
@@ -39,16 +39,16 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationEntit
     // 만료 일괄 처리(선택): 홀드 시간 지난 PENDING들을 일괄 만료
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
-           update ReservationEntity r
-              set r.status = 'EXPIRED',
+           UPDATE ReservationEntity r
+              SET r.status = 'EXPIRED',
                   r.expiredAt = :now,
                   r.isActive = false
-            where r.status = 'PENDING'
-              and r.isActive = true
-              and r.holdExpiresAt <= :now
+            WHERE r.status = 'PENDING'
+              AND r.isActive = true
+              AND r.holdExpiresAt <= :now
            """)
     int bulkExpireStaled(@Param("now") LocalDateTime now);
 
-    @Query("select s.price from ConcertSeatEntity s where s.id = :seatId")
+    @Query("SELECT s.price FROM ConcertSeatEntity s WHERE s.id = :seatId")
     Long findSeatPriceBySeatId(@Param("seatId") Long seatId);
 }

@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.reservation.application.usecase;
 
-import kr.hhplus.be.server.common.enums.ReservationStatus;
 import kr.hhplus.be.server.common.exception.reservation.ReservationAccessDeniedException;
 import kr.hhplus.be.server.common.exception.reservation.SeatAlreadyReservedException;
 import kr.hhplus.be.server.identity.infrastructure.jpa.repository.UserJpaRepository;
