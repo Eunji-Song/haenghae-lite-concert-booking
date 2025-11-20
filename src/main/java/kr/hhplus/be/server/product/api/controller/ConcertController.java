@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.product.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.hhplus.be.server.common.security.user.CurrentUserUuid;
 import kr.hhplus.be.server.product.api.dto.OpenDateResponse;
@@ -25,7 +26,7 @@ public class ConcertController {
     @Operation(summary = "콘서트 예약 가능 일자 조회")
     @GetMapping("/{concertId}/dates")
     public ResponseEntity<List<OpenDateResponse>> getOpenDates(
-            @CurrentUserUuid String userUuid,
+            @Parameter(hidden = true)  @CurrentUserUuid String userUuid,
             @RequestHeader("X-Queue-Token") String queueToken,
             @PathVariable Long concertId
     ) {
@@ -35,7 +36,7 @@ public class ConcertController {
     @Operation(summary = "콘서트 예약 가능 일자별 좌석 조회")
     @GetMapping("/{concertId}/dates/{date}/seats")
     public ResponseEntity<List<SeatAvailabilityResponse>> getSeats(
-            @CurrentUserUuid String userUuid,
+            @Parameter(hidden = true) @CurrentUserUuid String userUuid,
             @RequestHeader("X-Queue-Token") String queueToken,
             @PathVariable Long concertId,
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date

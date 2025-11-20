@@ -1,28 +1,25 @@
 openapi: 3.0.1
 info:
-  title: OpenAPI definition
-  version: v0
+  title: My API
+  version: v1
 servers:
-- url: http://localhost:8080
-  description: Generated server url
+  - url: http://localhost:8080
+    description: Generated server url
+security:
+  - Bearer Authentication: []
 paths:
   /api/v1/wallet/charge:
     post:
       tags:
-      - 충전 계좌
+        - 충전 계좌
       summary: 충전
       operationId: charge
       parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: Idempotency-Key
-        in: header
-        required: true
-        schema:
-          type: string
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -37,22 +34,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/WalletBalanceResponse"
   /api/v1/reservations:
+    get:
+      tags:
+        - 예약
+      summary: 내 예약 목록
+      operationId: getMy
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReservationDetailResponse"
     post:
       tags:
-      - 예약
+        - 예약
       summary: 좌석 예약(홀드)
       operationId: reserveSeat
       parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: X-Queue-Token
-        in: header
-        required: true
-        schema:
-          type: string
+        - name: X-Queue-Token
+          in: header
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -66,43 +72,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ReservationResponse"
-  /api/v1/reservations/{reservationId}/cancel:
-    post:
-      tags:
-      - 예약
-      summary: 예약 취소
-      operationId: cancelReservation
-      parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: reservationId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/CancelReservationResponse"
   /api/v1/queue/token:
     post:
       tags:
-      - 대기열
+        - 대기열
       summary: 대기열 토큰 발급
       operationId: issue
-      parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
       requestBody:
         content:
           application/json:
@@ -119,25 +94,20 @@ paths:
   /api/v1/payments:
     post:
       tags:
-      - 결제
+        - 결제
       summary: 결제 & 예약 확정
       operationId: pay
       parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: X-Queue-Token
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Idempotency-Key
-        in: header
-        required: false
-        schema:
-          type: string
+        - name: X-Queue-Token
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -154,7 +124,7 @@ paths:
   /api/v1/auth/signup:
     post:
       tags:
-      - 인증
+        - 인증
       summary: 회원가입
       operationId: signup
       requestBody:
@@ -169,7 +139,7 @@ paths:
   /api/v1/auth/login:
     post:
       tags:
-      - 인증
+        - 인증
       summary: 로그인
       operationId: login
       requestBody:
@@ -188,15 +158,9 @@ paths:
   /api/v1/wallet/balance:
     get:
       tags:
-      - 충전 계좌
+        - 충전 계좌
       summary: 잔액 조회
       operationId: getBalance
-      parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
       responses:
         "200":
           description: OK
@@ -204,24 +168,57 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WalletBalanceResponse"
+  /api/v1/users/{userUuid}:
+    get:
+      tags:
+        - user-controller
+      summary: 사용자 조회(by UUID)
+      operationId: getUser
+      parameters:
+        - name: userUuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+  /api/v1/users/me:
+    get:
+      tags:
+        - user-controller
+      summary: 내 정보 조회
+      operationId: me
+      parameters:
+        - name: userUuid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
   /api/v1/reservations/{reservationId}:
     get:
       tags:
-      - 예약
+        - 예약
       summary: 예약 상세
-      operationId: getReservation
+      operationId: get
       parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: reservationId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "200":
           description: OK
@@ -229,44 +226,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ReservationDetailResponse"
-  /api/v1/reservations/me:
-    get:
-      tags:
-      - 예약
-      summary: 내 예약 목록
-      operationId: getMyReservations
-      parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ReservationSummaryResponse"
   /api/v1/queue/me:
     get:
       tags:
-      - 대기열
+        - 대기열
       summary: 대기 상태 폴링 (활성 대기)
-      operationId: me
+      operationId: me_1
       parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: X-Queue-Token
-        in: header
-        required: true
-        schema:
-          type: string
+        - name: X-Queue-Token
+          in: header
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: OK
@@ -277,26 +248,21 @@ paths:
   /api/v1/concerts/{concertId}/dates:
     get:
       tags:
-      - 콘서트 일정 및 좌석
+        - 콘서트 일정 및 좌석
       summary: 콘서트 예약 가능 일자 조회
       operationId: getOpenDates
       parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: X-Queue-Token
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: concertId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: X-Queue-Token
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: concertId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "200":
           description: OK
@@ -309,31 +275,27 @@ paths:
   /api/v1/concerts/{concertId}/dates/{date}/seats:
     get:
       tags:
-      - 콘서트 일정 및 좌석
+        - 콘서트 일정 및 좌석
       summary: 콘서트 예약 가능 일자별 좌석 조회
       operationId: getSeats
       parameters:
-      - name: userUuid
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: X-Queue-Token
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: concertId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      - name: date
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: X-Queue-Token
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: concertId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
       responses:
         "200":
           description: OK
@@ -343,12 +305,31 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SeatAvailabilityResponse"
+  /api/v1/reservations/{reservationId}/cancel:
+    delete:
+      tags:
+        - 예약
+      summary: 예약 취소
+      operationId: cancel
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
 components:
   schemas:
     WalletChargeRequest:
+      required:
+        - amount
       type: object
       properties:
         amount:
+          minimum: 1
           type: integer
           format: int64
     WalletBalanceResponse:
@@ -363,10 +344,6 @@ components:
           type: string
           format: date-time
     ReserveSeatRequest:
-      required:
-      - concertId
-      - date
-      - seatNo
       type: object
       properties:
         concertId:
@@ -375,9 +352,8 @@ components:
         date:
           type: string
         seatNo:
-          minimum: 1
           type: integer
-          format: int64
+          format: int32
     ReservationResponse:
       type: object
       properties:
@@ -387,11 +363,6 @@ components:
         holdExpiresAt:
           type: string
           format: date-time
-    CancelReservationResponse:
-      type: object
-      properties:
-        canceled:
-          type: boolean
     QueueTokenRequest:
       type: object
       properties:
@@ -406,9 +377,9 @@ components:
         status:
           type: string
           enum:
-          - ISSUED
-          - ACTIVE
-          - EXPIRED
+            - ISSUED
+            - ACTIVE
+            - EXPIRED
         rank:
           type: integer
           format: int64
@@ -416,16 +387,12 @@ components:
           type: integer
           format: int64
     PaymentRequest:
-      required:
-      - amount
-      - reservationId
       type: object
       properties:
         reservationId:
           type: integer
           format: int64
         amount:
-          minimum: 1
           type: integer
           format: int64
     PaymentResponse:
@@ -440,6 +407,10 @@ components:
         confirmed:
           type: boolean
     SignupRequest:
+      required:
+        - email
+        - name
+        - password
       type: object
       properties:
         email:
@@ -449,6 +420,9 @@ components:
         name:
           type: string
     LoginRequest:
+      required:
+        - email
+        - password
       type: object
       properties:
         email:
@@ -468,6 +442,15 @@ components:
         refreshTokenExpiresIn:
           type: integer
           format: int32
+    UserResponse:
+      type: object
+      properties:
+        userUuid:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
     ReservationDetailResponse:
       type: object
       properties:
@@ -484,11 +467,6 @@ components:
           format: int64
         status:
           type: string
-          enum:
-          - PENDING
-          - CONFIRMED
-          - CANCELED
-          - EXPIRED
         paidAmount:
           type: integer
           format: int64
@@ -501,30 +479,6 @@ components:
         updatedAt:
           type: string
           format: date-time
-    ReservationSummaryResponse:
-      type: object
-      properties:
-        reservationId:
-          type: integer
-          format: int64
-        concertId:
-          type: integer
-          format: int64
-        date:
-          type: string
-        seatNo:
-          type: integer
-          format: int64
-        status:
-          type: string
-          enum:
-          - PENDING
-          - CONFIRMED
-          - CANCELED
-          - EXPIRED
-        paidAmount:
-          type: integer
-          format: int64
     OpenDateResponse:
       type: object
       properties:
@@ -547,9 +501,19 @@ components:
           format: int64
         seatNo:
           type: integer
-          format: int64
+          format: int32
         price:
           type: integer
           format: int64
-        state:
+        status:
           type: string
+          enum:
+            - AVAILABLE
+            - HELD
+            - CONFIRMED
+  securitySchemes:
+    Bearer Authentication:
+      type: http
+      name: Authorization
+      scheme: bearer
+      bearerFormat: JWT

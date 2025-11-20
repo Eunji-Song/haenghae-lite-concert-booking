@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.reservation.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.hhplus.be.server.common.security.user.CurrentUserUuid;
 import kr.hhplus.be.server.reservation.api.dto.ReserveSeatRequest;
@@ -29,7 +30,7 @@ public class ReservationController {
     @Operation(summary = "좌석 예약(홀드)")
     @PostMapping
     public ResponseEntity<ReservationResponse> reserveSeat(
-            @CurrentUserUuid String userUuid,
+            @Parameter(hidden = true)  @CurrentUserUuid String userUuid,
             @RequestBody ReserveSeatRequest request,
             @RequestHeader("X-Queue-Token") String queueToken
     ) {
@@ -46,7 +47,7 @@ public class ReservationController {
     @Operation(summary = "예약 취소")
     @DeleteMapping("/{reservationId}/cancel")
     public ResponseEntity<Void> cancel(
-            @CurrentUserUuid String userUuid,
+            @Parameter(hidden = true) @CurrentUserUuid String userUuid,
             @PathVariable Long reservationId
     ) {
         cancelReservationUseCase.cancel(userUuid, reservationId);
@@ -56,7 +57,7 @@ public class ReservationController {
     @Operation(summary = "예약 상세")
     @GetMapping("/{reservationId}")
     public ResponseEntity<ReservationDetailResponse> get(
-            @CurrentUserUuid String userUuid,
+            @Parameter(hidden = true) @CurrentUserUuid String userUuid,
             @PathVariable Long reservationId
     ) {
         return ResponseEntity.ok(getReservationUseCase.get(userUuid, reservationId));
@@ -65,7 +66,7 @@ public class ReservationController {
     @Operation(summary = "내 예약 목록")
     @GetMapping()
     public ResponseEntity<java.util.List<ReservationDetailResponse>> getMy(
-            @CurrentUserUuid String userUuid
+            @Parameter(hidden = true) @CurrentUserUuid String userUuid
     ) {
         return ResponseEntity.ok(getReservationUseCase.getMy(userUuid));
     }

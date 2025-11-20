@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.payment.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.hhplus.be.server.common.security.user.CurrentUserUuid;
 import kr.hhplus.be.server.payment.api.dto.PaymentRequest;
@@ -22,7 +23,7 @@ public class PaymentController {
     @Operation(summary = "결제 & 예약 확정")
     @PostMapping
     public ResponseEntity<PaymentResponse> pay(
-            @CurrentUserUuid String userUuid,
+            @Parameter(hidden = true) @CurrentUserUuid String userUuid,
             @RequestBody PaymentRequest request,
             @RequestHeader("X-Queue-Token") String queueToken,
             @RequestHeader(value = "Idempotency-Key", required = false) String idemKey
