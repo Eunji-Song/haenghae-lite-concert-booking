@@ -48,7 +48,7 @@ public class JwtTokenProvider {
         Instant now = Instant.now();
         return Jwts.builder()
                 .setSubject(subject)
-                .setClaims(claims)
+                .addClaims(claims)
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusSeconds(ttlSeconds)))
                 .signWith(key, SignatureAlgorithm.HS256)

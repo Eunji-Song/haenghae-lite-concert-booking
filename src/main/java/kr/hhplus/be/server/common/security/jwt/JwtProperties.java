@@ -1,9 +1,5 @@
 package kr.hhplus.be.server.common.security.jwt;
 
-import lombok.Getter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -11,9 +7,9 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
 
-    private Key access;
-    private Key refresh;
-    private Key queue;
+    private Key access = new Key();
+    private Key refresh = new Key();
+    private Key queue = new Key();
 
     public Key getAccess() { return access; }
     public void setAccess(Key access) { this.access = access; }
