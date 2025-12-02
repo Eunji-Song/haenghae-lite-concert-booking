@@ -7,13 +7,14 @@ import kr.hhplus.be.server.payment.application.port.out.*;
 import kr.hhplus.be.server.payment.domain.model.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class PayForReservationService implements PayForReservationUseCase {
 
     private final QueuePort queuePort;
@@ -23,15 +24,15 @@ public class PayForReservationService implements PayForReservationUseCase {
 
     @Override
     public PaymentResponse pay(PayForReservationCommand cmd) {
-        // 1) 대기열 검증
+        // 대기열 검증
         queuePort.validate(cmd.userUuid(), cmd.queueToken());
 
-        // 2) 예약 로딩/검증
+        // 예약 로딩/검증
         ReservationForPayment res = reservationPort.getReservationForPayment(
                 cmd.reservationId(), cmd.userUuid()
         );
 
-        // 3) 멱등키 확인
+        // 멱등키 확인
         String idem = (cmd.idempotencyKey() != null && !cmd.idempotencyKey().isBlank())
                 ? cmd.idempotencyKey()
                 : UUID.randomUUID().toString();
@@ -39,18 +40,18 @@ public class PayForReservationService implements PayForReservationUseCase {
             return new PaymentResponse(null, res.reservationId(), true);
         }
 
-        // 4) 지갑 차감
+        // 지갑 차감
         walletPort.debit(res.userId(), res.amount(), null, idem);
 
-        // 5) 결제 저장 (성공)
+        // 결제 저장 (성공)
         Payment saved = paymentRepository.save(
                 Payment.succeeded(res.reservationId(), res.userId(), res.amount(), idem)
         );
 
-        // 6) 예약 확정
+        // 예약 확정
         reservationPort.confirm(res.reservationId(), cmd.userUuid());
 
-        // 7) 대기열 토큰 만료
+        // 대기열 토큰 만료
         queuePort.expireToken(cmd.userUuid(), res.concertId());
 
         return new PaymentResponse(saved.getId(), res.reservationId(), true);

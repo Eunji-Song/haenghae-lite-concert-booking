@@ -35,10 +35,10 @@ public class ReserveSeatService implements ReserveSeatUseCase {
         Long dateId = dateResolver.resolveDateId(cmd.concertId(), cmd.date());
         Long seatId = reservationRepository.resolveSeatId(cmd.concertId(), cmd.date(), cmd.seatNo());
 
-        // 1) 좌석 행 잠금
+        // 좌석 Lock
         reservationRepository.lockSeat(seatId);
 
-        // 2) 잠금 획득 후 점유 가능 재확인
+        // 점유 가능 재확인
         if (!reservationRepository.isSeatOccupiable(seatId)) {
             throw new SeatAlreadyReservedException();
         }
@@ -46,7 +46,7 @@ public class ReserveSeatService implements ReserveSeatUseCase {
         long amount = reservationRepository.findSeatPriceBySeatId(seatId);
         LocalDateTime holdUntil = LocalDateTime.now(clock).plusSeconds(cmd.holdSeconds());
 
-        // 3) 활성 홀드로 생성 (isActive=true)
+        // 활성 홀드로 생성 (isActive=true)
         Reservation pending = Reservation.pending(userId, cmd.concertId(), dateId, seatId, amount, holdUntil);
 
         var saved = reservationRepository.save(pending); // 유니크 위반 시 SeatAlreadyReservedException 변환

@@ -35,7 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional(propagation = Propagation.NOT_SUPPORTED) // 각 스레드가 독립 트랜잭션으로 동작하게
 class ConcurrentSeatReservationTest extends BaseIntegrationTest {
-
     private static final Logger log = LoggerFactory.getLogger(ConcurrentSeatReservationTest.class);
 
     @Autowired private ReserveSeatUseCase reserveSeatUseCase;
@@ -138,7 +137,7 @@ class ConcurrentSeatReservationTest extends BaseIntegrationTest {
         // ---------- Assert ----------
         assertThat(finished).as("모든 작업이 제한 시간 내 끝났는지").isTrue();
 
-        // 사후 검증: 실제로 좌석 기준 활성 예약(PENDING/CONFIRMED)이 몇 개인지 확인
+        // 실제로 좌석 기준 활성 예약(PENDING/CONFIRMED)이 몇 개인지 확인
         long active = reservationJpaRepository.countActiveBySeatId(seat.getId());
         log.info("success={}, fail={}, activeReservationsByQuery={}", successes.get(), failures.get(), active);
 

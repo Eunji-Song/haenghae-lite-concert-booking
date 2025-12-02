@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.identity.api.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.constraints.NotBlank;
 import kr.hhplus.be.server.common.security.user.CurrentUserUuid;
 import kr.hhplus.be.server.identity.api.dto.UserResponse;
@@ -13,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -32,7 +31,7 @@ public class UserController {
 
     @Operation(summary = "내 정보 조회")
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> me(@CurrentUserUuid String userUuid) {
+    public ResponseEntity<UserResponse> me(@Parameter(hidden = true) @CurrentUserUuid String userUuid) {
         User user = userService.getUser(userUuid);
         return ResponseEntity.ok(UserResponse.of(user.userUuid(), user.email(), user.name()));
     }

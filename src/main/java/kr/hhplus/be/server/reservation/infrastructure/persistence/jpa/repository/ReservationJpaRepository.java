@@ -8,47 +8,86 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Reservation JPA Repository.
+ *
+ * 예약 엔티티의 조회, 만료 처리 등의 DB 작업을 담당한다.
+ * 좌석 점유 여부 조회, 조건부 만료 업데이트, 만료 스케줄러용 일괄 업데이트,
+ * 좌석 가격 조회 기능 등을 제공한다.
+ */
 public interface ReservationJpaRepository extends JpaRepository<ReservationEntity, Long> {
 
-    // 좌석의 "현재 활성 점유" 수 → 0이면 점유 가능
+    /**
+     * 특정 좌석(seatId)에 대해 현재 활성(active) 상태의 예약 개수를 조회한다.<br>
+     * 활성 예약이 0이면 해당 좌석은 점유 가능하다.
+     *
+     * @param seatId 좌석 ID
+     * @return 활성 예약 개수
+     */
     @Query("""
-           select count(r)
-             from ReservationEntity r
-            where r.seatId = :seatId
-              and r.isActive = true
-           """)
+            SELECT COUNT(r)
+              FROM ReservationEntity r
+             WHERE r.seatId = :seatId
+               AND r.isActive = true
+            """)
     long countActiveBySeatId(@Param("seatId") Long seatId);
 
+    /**
+     * 특정 사용자가 생성한 모든 예약을 생성일 역순으로 조회한다.
+     *
+     * @param userId 사용자 ID
+     * @return 예약 리스트
+     */
     List<ReservationEntity> findAllByUser_IdOrderByCreatedAtDesc(Long userId);
 
-    // 단건 강제 만료 (선택 API): PENDING -> EXPIRED + isActive=false
+    /**
+     * 단일 예약을 강제로 만료(EXPIRED) 상태로 변경한다.<br>
+     * 상태가 PENDING이고 active 상태인 경우에만 업데이트된다.
+     *
+     * @param id      예약 ID
+     * @param expired 변경할 상태 (EXPIRED)
+     * @param now     만료 처리 시각
+     * @return 영향받은 row 수 (성공 시 1, 실패 시 0)
+     */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
-           update ReservationEntity r
-              set r.status = :expired,
-                  r.expiredAt = :now,
-                  r.isActive = false
-            where r.id = :id
-              and r.status = 'PENDING'
-              and r.isActive = true
-           """)
+            UPDATE ReservationEntity r
+               SET r.status = :expired,
+                   r.expiredAt = :now,
+                   r.isActive = false
+             WHERE r.id = :id
+               AND r.status = 'PENDING'
+               AND r.isActive = true
+            """)
     int forceExpire(@Param("id") Long id,
                     @Param("expired") ReservationStatus expired,
                     @Param("now") LocalDateTime now);
 
-    // 만료 일괄 처리(선택): 홀드 시간 지난 PENDING들을 일괄 만료
+    /**
+     * 홀드 만료 시간이 지난 모든 PENDING 예약을 EXPIRED 상태로 변경한다.<br>
+     * 스케줄러에서 호출되는 일괄 업데이트용 쿼리다.
+     *
+     * @param now 만료 조건 기준 시각
+     * @return 만료 처리된 row 개수
+     */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
-           update ReservationEntity r
-              set r.status = 'EXPIRED',
-                  r.expiredAt = :now,
-                  r.isActive = false
-            where r.status = 'PENDING'
-              and r.isActive = true
-              and r.holdExpiresAt <= :now
-           """)
+            UPDATE ReservationEntity r
+               SET r.status = 'EXPIRED',
+                   r.expiredAt = :now,
+                   r.isActive = false
+             WHERE r.status = 'PENDING'
+               AND r.isActive = true
+               AND r.holdExpiresAt <= :now
+            """)
     int bulkExpireStaled(@Param("now") LocalDateTime now);
 
-    @Query("select s.price from ConcertSeatEntity s where s.id = :seatId")
+    /**
+     * 좌석 ID를 기반으로 좌석 가격을 조회한다.
+     *
+     * @param seatId 좌석 ID
+     * @return 좌석 가격
+     */
+    @Query("SELECT s.price FROM ConcertSeatEntity s WHERE s.id = :seatId")
     Long findSeatPriceBySeatId(@Param("seatId") Long seatId);
 }

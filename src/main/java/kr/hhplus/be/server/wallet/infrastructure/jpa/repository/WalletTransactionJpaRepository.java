@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface WalletTransactionJpaRepository extends JpaRepository<WalletTransactionEntity, Long> {
 
-    @Query("select max(w.createdAt) from WalletTransactionEntity w where w.user.id = :userId")
+    @Query("SELECT max(w.createdAt) FROM WalletTransactionEntity w WHERE w.user.id = :userId")
     Optional<LocalDateTime> findTopCreatedAtByUserIdOrderByCreatedAtDesc(Long userId);
 }

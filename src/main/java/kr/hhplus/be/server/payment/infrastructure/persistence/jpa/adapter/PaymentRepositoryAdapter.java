@@ -2,6 +2,7 @@ package kr.hhplus.be.server.payment.infrastructure.persistence.jpa.adapter;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import kr.hhplus.be.server.common.enums.PaymentStatus;
 import kr.hhplus.be.server.identity.infrastructure.jpa.entity.UserEntity;
 import kr.hhplus.be.server.payment.application.port.out.PaymentRepository;
 import kr.hhplus.be.server.payment.domain.model.Payment;
@@ -26,6 +27,11 @@ public class PaymentRepositoryAdapter implements PaymentRepository {
     private EntityManager em;
 
     @Override
+    public Optional<Payment> findById(Long paymentId) {
+        return jpa.findById(paymentId).map(PaymentJpaMapper::toDomain);
+    }
+
+    @Override
     public boolean existsByIdempotencyKey(String idempotencyKey) {
         return jpa.existsByIdempotencyKey(idempotencyKey);
     }
@@ -44,7 +50,7 @@ public class PaymentRepositoryAdapter implements PaymentRepository {
     @Override
     public Optional<Payment> findSucceededByReservationId(Long reservationId) {
         return jpa.findByReservation_IdAndStatus(
-                        reservationId, kr.hhplus.be.server.common.enums.PaymentStatus.SUCCEEDED)
+                        reservationId, PaymentStatus.SUCCEEDED)
                 .map(PaymentJpaMapper::toDomain);
     }
 }

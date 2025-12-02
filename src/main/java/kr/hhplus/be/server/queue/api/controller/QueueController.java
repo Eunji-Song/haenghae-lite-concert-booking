@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.queue.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.hhplus.be.server.common.enums.QueueStatus;
 import kr.hhplus.be.server.common.security.user.CurrentUserUuid;
@@ -22,7 +23,7 @@ public class QueueController {
     @Operation(summary = "대기열 토큰 발급")
     @PostMapping("/token")
     public ResponseEntity<QueueTokenResponse> issue(
-            @CurrentUserUuid String userUuid,
+            @Parameter(hidden = true)  @CurrentUserUuid String userUuid,
             @RequestBody QueueTokenRequest request
     ) {
         var entry = queueService.issue(userUuid, request.concertId());
@@ -34,7 +35,7 @@ public class QueueController {
     @Operation(summary = "대기 상태 폴링 (활성 대기)")
     @GetMapping("/me")
     public ResponseEntity<QueueTokenResponse> me(
-            @CurrentUserUuid String userUuid,
+            @Parameter(hidden = true) @CurrentUserUuid String userUuid,
             @RequestHeader("X-Queue-Token") String queueToken
     ) {
         QueueStatus status = queueService.statusOf(queueToken, userUuid);
