@@ -17,6 +17,10 @@ spring:
     init:
       mode: never
 
+  # 테스트 환경에서는 Redis 없이 인메모리 캐시 사용
+  cache:
+    type: simple
+
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
