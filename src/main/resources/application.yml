@@ -33,6 +33,14 @@ jwt:
     secret: "zXcVbNmAsDfGhJkLqWeRtYuIoP0987654321)(*&^%$#@!~AaBbCcDdEeFf"
     expiration: 900
 
+  cache:
+    type: redis          # 캐시 구현체로 Redis 사용
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 # -------------------------------------------------------------------
 # local 프로파일: 로컬 개발 (이미 데이터가 있을 수 있으므로 baseline 허용)
 # -------------------------------------------------------------------
@@ -45,7 +53,7 @@ spring:
   datasource:
     name: HangHaePlusDataSource
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3307/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
     username: application
     password: application
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -67,6 +75,7 @@ spring:
     baseline-version: 1
     schemas: hhplus
     default-schema: hhplus
+
 
   sql:
     init:

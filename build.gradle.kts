@@ -50,6 +50,9 @@ dependencies {
     // Redis (대기열 교체 시 사용)
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
+    // 캐시 
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+
     // Swagger/OpenAPI
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
 
