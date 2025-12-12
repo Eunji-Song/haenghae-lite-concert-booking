@@ -30,6 +30,8 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+    org.springframework.data.redis: debug
+    io.lettuce.core: debug
 
 # 내장 톰캣 포트 충돌 방지
 server:

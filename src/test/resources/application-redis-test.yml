@@ -1,0 +1,34 @@
+spring:
+  config:
+    activate:
+      on-profile: redis-test
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2s
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 60s
+      cache-null-values: false
+
+  task:
+    scheduling:
+      enabled: false
+
+  main:
+    allow-bean-definition-overriding: true
+
+logging:
+  level:
+    root: info
+    org.springframework.data.redis: debug
+    io.lettuce.core: info
+    kr.hhplus.be.server.queue: debug
+
+queue:
+  scheduler:
+    promotion-enabled: false
