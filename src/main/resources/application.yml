@@ -3,6 +3,9 @@ spring:
     name: hhplus
   profiles:
     active: local
+  cache:
+    type: redis
+
 
   # 공통 (JPA는 Flyway가 스키마를 관리하므로 ddl-auto:none)
   jpa:
@@ -33,8 +36,6 @@ jwt:
     secret: "zXcVbNmAsDfGhJkLqWeRtYuIoP0987654321)(*&^%$#@!~AaBbCcDdEeFf"
     expiration: 900
 
-  cache:
-    type: redis          # 캐시 구현체로 Redis 사용
 
   data:
     redis:
@@ -119,36 +120,36 @@ spring:
     init:
       mode: never
 
-# -------------------------------------------------------------------
-# test 프로파일: Testcontainers MySQL (매번 깨끗한 DB) - Flyway 단일 책임
-# -------------------------------------------------------------------
----
-spring:
-  config:
-    activate:
-      on-profile: test
+# # -------------------------------------------------------------------
+# # test 프로파일: Testcontainers MySQL (매번 깨끗한 DB) - Flyway 단일 책임
+# # -------------------------------------------------------------------
+# ---
+# spring:
+#   config:
+#     activate:
+#       on-profile: test
 
-  datasource:
-    name: HangHaePlusDataSource
-    type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      maximum-pool-size: 4
-      connection-timeout: 10000
-      max-lifetime: 120000
+#   datasource:
+#     name: HangHaePlusDataSource
+#     type: com.zaxxer.hikari.HikariDataSource
+#     driver-class-name: com.mysql.cj.jdbc.Driver
+#     hikari:
+#       maximum-pool-size: 4
+#       connection-timeout: 10000
+#       max-lifetime: 120000
 
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: none
+#   jpa:
+#     show-sql: true
+#     hibernate:
+#       ddl-auto: none
 
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: false   # 컨테이너가 매번 빈 DB 제공 → 베이스라인 불필요
-    schemas: hhplus
-    default-schema: hhplus
+#   flyway:
+#     enabled: true
+#     locations: classpath:db/migration
+#     baseline-on-migrate: false   # 컨테이너가 매번 빈 DB 제공 → 베이스라인 불필요
+#     schemas: hhplus
+#     default-schema: hhplus
 
-  sql:
-    init:
-      mode: never   # data.sql 자동 실행 금지 (중복 삽입 방지)
+#   sql:
+#     init:
+#       mode: never   # data.sql 자동 실행 금지 (중복 삽입 방지)

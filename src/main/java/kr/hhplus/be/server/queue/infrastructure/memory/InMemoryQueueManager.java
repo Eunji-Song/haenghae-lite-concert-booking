@@ -2,6 +2,9 @@ package kr.hhplus.be.server.queue.infrastructure.memory;
 
 import kr.hhplus.be.server.common.enums.QueueStatus;
 import kr.hhplus.be.server.queue.domain.model.QueueEntry;
+import kr.hhplus.be.server.queue.domain.repository.QueueManager;
+
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -15,11 +18,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * - 정책 단순화를 위해 ACTIVE 판정은 rank == 0 으로 가정(필요시 윈도우 사이즈 적용)
  */
 @Component
-public class InMemoryQueueManager {
+@Profile("test")
+public class InMemoryQueueManager implements QueueManager {
 
     private final Map<Long, AtomicLong> counters = new ConcurrentHashMap<>();
     private final Map<String, QueueEntry> tokenMap = new ConcurrentHashMap<>();
 
+    @Override
     public QueueEntry addToQueue(String userUuid, Long concertId) {
         long rank = counters.computeIfAbsent(concertId, k -> new AtomicLong(0)).getAndIncrement();
         String token = UUID.randomUUID().toString();
@@ -29,14 +34,10 @@ public class InMemoryQueueManager {
         return e;
     }
 
-    public Optional<QueueEntry> findByToken(String token) {
-        return Optional.ofNullable(tokenMap.get(token));
-    }
+    @Override public Optional<QueueEntry> findByToken(String token) { return Optional.ofNullable(tokenMap.get(token)); }
+    @Override public Optional<Long> rankOf(String token) { return findByToken(token).map(QueueEntry::rank); }
 
-    public Optional<Long> rankOf(String token) {
-        return findByToken(token).map(QueueEntry::rank);
-    }
-
+    @Override
     public QueueStatus statusOf(String token, String userUuid) {
         QueueEntry e = tokenMap.get(token);
         if (e == null) return QueueStatus.EXPIRED;
@@ -44,9 +45,14 @@ public class InMemoryQueueManager {
         return e.status();
     }
 
-    /** 결제 완료 등으로 토큰 만료 */
+    @Override
     public void removeByUserAndConcert(String userUuid, Long concertId) {
         tokenMap.values().removeIf(e -> Objects.equals(e.userUuid(), userUuid)
                 && Objects.equals(e.concertId(), concertId));
+    }
+
+    @Override
+    public long promote(Long concertId, int maxToPromote) {
+        return 0L;
     }
 }
