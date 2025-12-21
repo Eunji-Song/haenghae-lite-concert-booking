@@ -9,6 +9,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 public class CurrentUserUuidResolver implements HandlerMethodArgumentResolver {
+
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(CurrentUserUuid.class)
@@ -20,6 +21,10 @@ public class CurrentUserUuidResolver implements HandlerMethodArgumentResolver {
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) {
-        return SecurityUtils.getCurrentUserUuid();
+
+        // SecurityUtils에서 Optional을 반환하더라도 여기서 최종적으로 String으로 강제한다.
+        // 토큰이 없거나 인증이 안 된 경우는 401로 내려주는 게 맞으므로 예외를 던진다.
+        return SecurityUtils.getCurrentUserUuid()
+                .orElseThrow(() -> new IllegalStateException("Invalid or missing token"));
     }
 }
