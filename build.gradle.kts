@@ -49,7 +49,8 @@ dependencies {
 
     // Redis (대기열 교체 시 사용)
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    
     // 캐시 
     implementation("org.springframework.boot:spring-boot-starter-cache")
 
