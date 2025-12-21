@@ -5,6 +5,12 @@ spring:
     active: local
   cache:
     type: redis
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 
 
   # 공통 (JPA는 Flyway가 스키마를 관리하므로 ddl-auto:none)
@@ -37,12 +43,11 @@ jwt:
     expiry-seconds: 900
 
 
+external:
+  data-platform:
+    base-url: http://localhost:8080
 
 
-  data:
-    redis:
-      host: localhost
-      port: 6379
 
 # -------------------------------------------------------------------
 # local 프로파일: 로컬 개발 (이미 데이터가 있을 수 있으므로 baseline 허용)

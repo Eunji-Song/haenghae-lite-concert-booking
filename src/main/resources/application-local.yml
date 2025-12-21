@@ -1,0 +1,26 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
+    username: application
+    password: application
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5
+      connection-timeout: 15000
+      max-lifetime: 180000
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 1
+    schemas: hhplus
+    default-schema: hhplus
+
+  sql:
+    init:
+      mode: never
