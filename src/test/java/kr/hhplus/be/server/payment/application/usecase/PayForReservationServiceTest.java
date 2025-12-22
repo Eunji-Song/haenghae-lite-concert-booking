@@ -5,6 +5,7 @@ import kr.hhplus.be.server.payment.application.port.in.command.PayForReservation
 import kr.hhplus.be.server.payment.application.port.in.result.PaymentResponse;
 import kr.hhplus.be.server.payment.application.port.out.*;
 import kr.hhplus.be.server.payment.domain.model.Payment;
+import kr.hhplus.be.server.reservation.infrastructure.kafka.ReservationConfirmedProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,6 +30,7 @@ class PayForReservationServiceTest {
     private ReservationPort reservationPort;
     private WalletPort walletPort;
     private PaymentRepository paymentRepository;
+    private ReservationConfirmedProducer reservationConfirmedProducer;
 
     private ApplicationEventPublisher eventPublisher;
     private Clock clock;
@@ -41,6 +43,7 @@ class PayForReservationServiceTest {
         reservationPort = mock(ReservationPort.class);
         walletPort = mock(WalletPort.class);
         paymentRepository = mock(PaymentRepository.class);
+        reservationConfirmedProducer = mock(ReservationConfirmedProducer.class);
 
         eventPublisher = mock(ApplicationEventPublisher.class);
 
@@ -52,6 +55,7 @@ class PayForReservationServiceTest {
                 reservationPort,
                 walletPort,
                 paymentRepository,
+                reservationConfirmedProducer,
                 eventPublisher,
                 clock
         );
@@ -89,6 +93,9 @@ class PayForReservationServiceTest {
         // 6) 예약 확정 OK
         doNothing().when(reservationPort).confirm(reservationId, userUuid);
 
+        // 6-1) Kafka 발행 OK
+        doNothing().when(reservationConfirmedProducer).send(any());
+
         // 7) 대기열 만료 OK
         doNothing().when(queuePort).expireToken(userUuid, concertId);
 
@@ -111,12 +118,13 @@ class PayForReservationServiceTest {
         verify(walletPort).debit(userId, amount, null, idem);
         verify(paymentRepository).save(any(Payment.class));
         verify(reservationPort).confirm(reservationId, userUuid);
+        verify(reservationConfirmedProducer).send(any());
         verify(queuePort).expireToken(userUuid, concertId);
 
         // 이벤트 발행 검증
         verify(eventPublisher).publishEvent(any(PaymentCompletedEvent.class));
 
-        verifyNoMoreInteractions(queuePort, reservationPort, walletPort, paymentRepository, eventPublisher);
+        verifyNoMoreInteractions(queuePort, reservationPort, walletPort, paymentRepository, reservationConfirmedProducer, eventPublisher);
     }
 
     @Test
@@ -161,12 +169,13 @@ class PayForReservationServiceTest {
         verifyNoInteractions(walletPort);
         verify(paymentRepository, never()).save(any());
         verify(reservationPort, never()).confirm(anyLong(), anyString());
+        verify(reservationConfirmedProducer, never()).send(any());
         verify(queuePort, never()).expireToken(anyString(), anyLong());
 
         // 이벤트도 재발행하지 않음
         verify(eventPublisher, never()).publishEvent(any());
 
-        verifyNoMoreInteractions(queuePort, reservationPort, paymentRepository, eventPublisher);
+        verifyNoMoreInteractions(queuePort, reservationPort, paymentRepository, reservationConfirmedProducer, eventPublisher);
     }
 
     @Test
@@ -190,7 +199,7 @@ class PayForReservationServiceTest {
         // then: 이후 단계는 전혀 호출되지 않아야 함
         verify(queuePort).validate(userUuid, queueToken);
 
-        verifyNoInteractions(reservationPort, walletPort, paymentRepository, eventPublisher);
+        verifyNoInteractions(reservationPort, walletPort, paymentRepository, reservationConfirmedProducer, eventPublisher);
         verifyNoMoreInteractions(queuePort);
     }
 }

@@ -48,15 +48,33 @@ external:
     base-url: http://localhost:8080
 
 
+app:
+  kafka:
+    topics:
+      reservation-confirmed: reservation-confirmed
 
 # -------------------------------------------------------------------
 # local 프로파일: 로컬 개발 (이미 데이터가 있을 수 있으므로 baseline 허용)
 # -------------------------------------------------------------------
 ---
+---
 spring:
   config:
     activate:
       on-profile: local
+
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: hhplus-local
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 
   datasource:
     name: HangHaePlusDataSource
