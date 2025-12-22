@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class WalletService {
 
     private final UserRepository userRepository;

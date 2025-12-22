@@ -22,42 +22,42 @@ import java.util.Map;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        String defaultId = "bcrypt";
-        Map<String, PasswordEncoder> encoders = Map.of(
-                "bcrypt", new BCryptPasswordEncoder(12), // strength(라운드) 조정
-                "argon2", Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8()
-        );
-        return new DelegatingPasswordEncoder(defaultId, encoders);
-    }
-    @Bean
-    public JwtTokenProvider jwtTokenProvider(JwtProperties props) {
-        return new JwtTokenProvider(props);
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                String defaultId = "bcrypt";
+                Map<String, PasswordEncoder> encoders = Map.of(
+                                "bcrypt", new BCryptPasswordEncoder(12), // strength(라운드) 조정
+                                "argon2", Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
+                return new DelegatingPasswordEncoder(defaultId, encoders);
+        }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtTokenProvider jwt) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(
-                        org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
-                .exceptionHandling(eh -> eh.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs.yaml",
-                                "/api/v1/auth/**"
-                        ).permitAll()
+        @Bean
+        public JwtTokenProvider jwtTokenProvider(JwtProperties props) {
+                return new JwtTokenProvider(props);
+        }
 
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(new JwtAuthenticationFilter(jwt), UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http, JwtTokenProvider jwt) throws Exception {
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .cors(Customizer.withDefaults())
+                                .sessionManagement(sm -> sm.sessionCreationPolicy(
+                                                org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
+                                .exceptionHandling(eh -> eh.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(
+                                                                "/swagger-ui/**",
+                                                                "/v3/api-docs/**",
+                                                                "/swagger-ui.html",
+                                                                "/v3/api-docs.yaml",
+                                                                "/api/v1/auth/**",
+                                                                "/mock/**")
+                                                .permitAll()
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(new JwtAuthenticationFilter(jwt),
+                                                UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                return http.build();
+        }
 
 }
