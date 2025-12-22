@@ -79,6 +79,11 @@ dependencies {
     testImplementation("org.flywaydb:flyway-core")
     testRuntimeOnly("org.flywaydb:flyway-mysql")
 
+
+    // Kafka 
+    implementation("org.springframework.kafka:spring-kafka")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
+
 }
 
 tasks.withType<Test> {
