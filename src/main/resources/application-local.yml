@@ -3,6 +3,15 @@ spring:
     activate:
       on-profile: local
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: payment-event-consumer
+      auto-offset-reset: earliest
+    producer:
+      properties:
+        enable.idempotence: true
+
   datasource:
     url: jdbc:mysql://localhost:3307/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
     username: application
