@@ -24,6 +24,7 @@ import java.util.UUID;
  *
  * - 결제 트랜잭션의 핵심 로직만 담당
  * - 결제 완료 이후의 부가 작업(외부 전송 등)은 이벤트로 분리
+ * 
  */
 @Service
 @RequiredArgsConstructor
@@ -86,7 +87,7 @@ public class PayForReservationService implements PayForReservationUseCase {
                 // 6. 예약 상태를 확정 상태로 변경
                 reservationPort.confirm(res.reservationId(), cmd.userUuid());
 
-                // 6-1. 예약 확정 Kafka 발행 (과제 목표)
+                // 6-1. 예약 확정 Kafka 발행
                 ReservationConfirmedMessage message = new ReservationConfirmedMessage(
                                 res.reservationId(),
                                 res.userId(),

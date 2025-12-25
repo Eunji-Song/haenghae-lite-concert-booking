@@ -26,11 +26,9 @@ public class PaymentController {
             @Parameter(hidden = true) @CurrentUserUuid String userUuid,
             @RequestBody PaymentRequest request,
             @RequestHeader("X-Queue-Token") String queueToken,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idemKey
-    ) {
+            @RequestHeader(value = "Idempotency-Key", required = false) String idemKey) {
         var cmd = new PayForReservationCommand(
-                userUuid, request.reservationId(), request.amount(), queueToken, idemKey
-        );
+                userUuid, request.reservationId(), request.amount(), queueToken, idemKey);
         return ResponseEntity.ok(payForReservationUseCase.pay(cmd));
     }
 }
