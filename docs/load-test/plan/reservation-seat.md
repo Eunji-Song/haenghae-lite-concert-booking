@@ -150,3 +150,16 @@
 - (본 테스트) `POST /api/v1/reservations`를 동시 호출
 - 결과 체크(성공/실패 카운트, latency 측정)
 
+
+## macOs 기준 k6 설치 방법 
+```
+# homebrew 버전 확인 
+brew --version
+
+# K6 설치 
+brew install k6
+
+# 설치 확인 
+k6 version -> ex. k6 v1.4.2 (commit/devel, go1.25.4, darwin/arm64)
+
+```
