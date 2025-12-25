@@ -3,6 +3,19 @@ spring:
     activate:
       on-profile: local
 
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: hhplus-local
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
   datasource:
     url: jdbc:mysql://localhost:3307/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
     username: application
@@ -20,6 +33,7 @@ spring:
     baseline-version: 1
     schemas: hhplus
     default-schema: hhplus
+    clean-disabled: false
 
   sql:
     init:

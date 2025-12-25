@@ -14,7 +14,9 @@ public class SeatAlreadyReservedException extends BaseException {
     }
 
     public SeatAlreadyReservedException(Long seatId) {
-        super(ErrorCode.SEAT_ALREADY_RESERVED,
-                String.format("좌석 ID: %d는 이미 예약된 상태입니다", seatId));
+        super(
+                ErrorCode.SEAT_ALREADY_RESERVED,
+                String.format("좌석 ID: %d는 이미 예약된 좌석입니다", seatId)
+        );
     }
 }

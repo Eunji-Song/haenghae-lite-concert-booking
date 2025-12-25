@@ -1,1 +1,922 @@
-{"openapi":"3.0.1","info":{"title":"My API","version":"v1"},"servers":[{"url":"http://localhost:8080","description":"Generated server url"}],"security":[{"Bearer Authentication":[]}],"paths":{"/api/v1/wallet/charge":{"post":{"tags":["충전 계좌"],"summary":"충전","operationId":"charge","parameters":[{"name":"Idempotency-Key","in":"header","required":true,"schema":{"type":"string"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/WalletChargeRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/WalletBalanceResponse"}}}}}}},"/api/v1/reservations":{"get":{"tags":["예약"],"summary":"내 예약 목록","operationId":"getMy","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/ReservationDetailResponse"}}}}}}},"post":{"tags":["예약"],"summary":"좌석 예약(홀드)","operationId":"reserveSeat","parameters":[{"name":"X-Queue-Token","in":"header","required":true,"schema":{"type":"string"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ReserveSeatRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ReservationResponse"}}}}}}},"/api/v1/queue/token":{"post":{"tags":["대기열"],"summary":"대기열 토큰 발급","operationId":"issue","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/QueueTokenRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/QueueTokenResponse"}}}}}}},"/api/v1/payments":{"post":{"tags":["결제"],"summary":"결제 & 예약 확정","operationId":"pay","parameters":[{"name":"X-Queue-Token","in":"header","required":true,"schema":{"type":"string"}},{"name":"Idempotency-Key","in":"header","required":false,"schema":{"type":"string"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/PaymentRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/PaymentResponse"}}}}}}},"/api/v1/auth/signup":{"post":{"tags":["인증"],"summary":"회원가입","operationId":"signup","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/SignupRequest"}}},"required":true},"responses":{"200":{"description":"OK"}}}},"/api/v1/auth/login":{"post":{"tags":["인증"],"summary":"로그인","operationId":"login","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/LoginRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/UserToken"}}}}}}},"/api/v1/wallet/balance":{"get":{"tags":["충전 계좌"],"summary":"잔액 조회","operationId":"getBalance","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/WalletBalanceResponse"}}}}}}},"/api/v1/users/{userUuid}":{"get":{"tags":["user-controller"],"summary":"사용자 조회(by UUID)","operationId":"getUser","parameters":[{"name":"userUuid","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/UserResponse"}}}}}}},"/api/v1/users/me":{"get":{"tags":["user-controller"],"summary":"내 정보 조회","operationId":"me","parameters":[{"name":"userUuid","in":"query","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/UserResponse"}}}}}}},"/api/v1/reservations/{reservationId}":{"get":{"tags":["예약"],"summary":"예약 상세","operationId":"get","parameters":[{"name":"reservationId","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ReservationDetailResponse"}}}}}}},"/api/v1/queue/me":{"get":{"tags":["대기열"],"summary":"대기 상태 폴링 (활성 대기)","operationId":"me_1","parameters":[{"name":"X-Queue-Token","in":"header","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/QueueTokenResponse"}}}}}}},"/api/v1/concerts/{concertId}/dates":{"get":{"tags":["콘서트 일정 및 좌석"],"summary":"콘서트 예약 가능 일자 조회","operationId":"getOpenDates","parameters":[{"name":"X-Queue-Token","in":"header","required":true,"schema":{"type":"string"}},{"name":"concertId","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/OpenDateResponse"}}}}}}}},"/api/v1/concerts/{concertId}/dates/{date}/seats":{"get":{"tags":["콘서트 일정 및 좌석"],"summary":"콘서트 예약 가능 일자별 좌석 조회","operationId":"getSeats","parameters":[{"name":"X-Queue-Token","in":"header","required":true,"schema":{"type":"string"}},{"name":"concertId","in":"path","required":true,"schema":{"type":"integer","format":"int64"}},{"name":"date","in":"path","required":true,"schema":{"type":"string","format":"date"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/SeatAvailabilityResponse"}}}}}}}},"/api/v1/reservations/{reservationId}/cancel":{"delete":{"tags":["예약"],"summary":"예약 취소","operationId":"cancel","parameters":[{"name":"reservationId","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"200":{"description":"OK"}}}}},"components":{"schemas":{"WalletChargeRequest":{"required":["amount"],"type":"object","properties":{"amount":{"minimum":1,"type":"integer","format":"int64"}}},"WalletBalanceResponse":{"type":"object","properties":{"balance":{"type":"integer","format":"int64"},"currency":{"type":"string"},"lastUpdatedAt":{"type":"string","format":"date-time"}}},"ReserveSeatRequest":{"type":"object","properties":{"concertId":{"type":"integer","format":"int64"},"date":{"type":"string"},"seatNo":{"type":"integer","format":"int32"}}},"ReservationResponse":{"type":"object","properties":{"reservationId":{"type":"integer","format":"int64"},"holdExpiresAt":{"type":"string","format":"date-time"}}},"QueueTokenRequest":{"type":"object","properties":{"concertId":{"type":"integer","format":"int64"}}},"QueueTokenResponse":{"type":"object","properties":{"queueToken":{"type":"string"},"status":{"type":"string","enum":["ISSUED","ACTIVE","EXPIRED"]},"rank":{"type":"integer","format":"int64"},"etaSeconds":{"type":"integer","format":"int64"}}},"PaymentRequest":{"type":"object","properties":{"reservationId":{"type":"integer","format":"int64"},"amount":{"type":"integer","format":"int64"}}},"PaymentResponse":{"type":"object","properties":{"paymentId":{"type":"integer","format":"int64"},"reservationId":{"type":"integer","format":"int64"},"confirmed":{"type":"boolean"}}},"SignupRequest":{"required":["email","name","password"],"type":"object","properties":{"email":{"type":"string"},"password":{"type":"string"},"name":{"type":"string"}}},"LoginRequest":{"required":["email","password"],"type":"object","properties":{"email":{"type":"string"},"password":{"type":"string"}}},"UserToken":{"type":"object","properties":{"accessToken":{"type":"string"},"accessTokenExpiresIn":{"type":"integer","format":"int32"},"refreshToken":{"type":"string"},"refreshTokenExpiresIn":{"type":"integer","format":"int32"}}},"UserResponse":{"type":"object","properties":{"userUuid":{"type":"string"},"email":{"type":"string"},"name":{"type":"string"}}},"ReservationDetailResponse":{"type":"object","properties":{"reservationId":{"type":"integer","format":"int64"},"concertId":{"type":"integer","format":"int64"},"date":{"type":"string"},"seatNo":{"type":"integer","format":"int64"},"status":{"type":"string"},"paidAmount":{"type":"integer","format":"int64"},"holdExpiresAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}},"OpenDateResponse":{"type":"object","properties":{"concertDateId":{"type":"integer","format":"int64"},"concertId":{"type":"integer","format":"int64"},"date":{"type":"string","format":"date"},"open":{"type":"boolean"}}},"SeatAvailabilityResponse":{"type":"object","properties":{"seatId":{"type":"integer","format":"int64"},"seatNo":{"type":"integer","format":"int32"},"price":{"type":"integer","format":"int64"},"status":{"type":"string","enum":["AVAILABLE","HELD","CONFIRMED"]}}}},"securitySchemes":{"Bearer Authentication":{"type":"http","name":"Authorization","scheme":"bearer","bearerFormat":"JWT"}}}}
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "My API",
+      "version": "v1"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:8080",
+        "description": "Generated server url"
+      }
+    ],
+    "security": [
+      {
+        "Bearer Authentication": []
+      }
+    ],
+    "tags": [
+      {
+        "name": "콘서트 랭킹",
+        "description": "빠른 매진 랭킹 조회 API"
+      }
+    ],
+    "paths": {
+      "/mock/data-platform/payments/completed": {
+        "post": {
+          "tags": [
+            "mock-data-platform-controller"
+          ],
+          "operationId": "receivePaymentCompleted",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentCompletedEvent"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/api/v1/wallet/charge": {
+        "post": {
+          "tags": [
+            "충전 계좌"
+          ],
+          "summary": "충전",
+          "operationId": "charge",
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletChargeRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/WalletBalanceResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/reservations": {
+        "get": {
+          "tags": [
+            "예약"
+          ],
+          "summary": "내 예약 목록",
+          "operationId": "getMy",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReservationDetailResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "예약"
+          ],
+          "summary": "좌석 예약(홀드)",
+          "operationId": "reserveSeat",
+          "parameters": [
+            {
+              "name": "X-Queue-Token",
+              "in": "header",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReserveSeatRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ReservationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/queue/token": {
+        "post": {
+          "tags": [
+            "대기열"
+          ],
+          "summary": "대기열 토큰 발급",
+          "operationId": "issue",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueueTokenRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/QueueTokenResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/payments": {
+        "post": {
+          "tags": [
+            "결제"
+          ],
+          "summary": "결제 & 예약 확정",
+          "operationId": "pay",
+          "parameters": [
+            {
+              "name": "X-Queue-Token",
+              "in": "header",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "required": false,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/PaymentResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/auth/signup": {
+        "post": {
+          "tags": [
+            "인증"
+          ],
+          "summary": "회원가입",
+          "operationId": "signup",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignupRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/api/v1/auth/login": {
+        "post": {
+          "tags": [
+            "인증"
+          ],
+          "summary": "로그인",
+          "operationId": "login",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserToken"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/wallet/balance": {
+        "get": {
+          "tags": [
+            "충전 계좌"
+          ],
+          "summary": "잔액 조회",
+          "operationId": "getBalance",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/WalletBalanceResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/users/{userUuid}": {
+        "get": {
+          "tags": [
+            "user-controller"
+          ],
+          "summary": "사용자 조회(by UUID)",
+          "operationId": "getUser",
+          "parameters": [
+            {
+              "name": "userUuid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/users/me": {
+        "get": {
+          "tags": [
+            "user-controller"
+          ],
+          "summary": "내 정보 조회",
+          "operationId": "me",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/reservations/{reservationId}": {
+        "get": {
+          "tags": [
+            "예약"
+          ],
+          "summary": "예약 상세",
+          "operationId": "get",
+          "parameters": [
+            {
+              "name": "reservationId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ReservationDetailResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/rankings/concerts/soldout": {
+        "get": {
+          "tags": [
+            "콘서트 랭킹"
+          ],
+          "summary": "월별 빠른 매진 콘서트 랭킹 조회",
+          "description": "주어진 month(yyyy-MM) 기준으로, 가장 빨리 매진된 콘서트 TOP N을 조회합니다.\n- Redis Sorted Set을 이용해 매진 시각(soldOutAt)을 score로 저장합니다.\n- score가 작을수록(더 이른 시각일수록) 높은 순위(1등)에 위치합니다.\n- month 파라미터가 비어있으면, 서버 기준 현재 월(예: Asia/Seoul)을 기본값으로 사용합니다.\n",
+          "operationId": "getFastSoldOutRanking",
+          "parameters": [
+            {
+              "name": "month",
+              "in": "query",
+              "description": "조회 대상 월 (yyyy-MM). 예: 2025-12. 비워두면 현재 월 기준.",
+              "required": false,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "description": "조회할 랭킹 개수 (기본값 10)",
+              "required": false,
+              "schema": {
+                "type": "integer",
+                "format": "int32",
+                "default": 10
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/FastSoldOutConcertResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/queue/me": {
+        "get": {
+          "tags": [
+            "대기열"
+          ],
+          "summary": "대기 상태 폴링 (활성 대기)",
+          "operationId": "me_1",
+          "parameters": [
+            {
+              "name": "X-Queue-Token",
+              "in": "header",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "$ref": "#/components/schemas/QueueTokenResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/concerts/{concertId}/dates": {
+        "get": {
+          "tags": [
+            "콘서트 일정 및 좌석"
+          ],
+          "summary": "콘서트 예약 가능 일자 조회",
+          "operationId": "getOpenDates",
+          "parameters": [
+            {
+              "name": "X-Queue-Token",
+              "in": "header",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "concertId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OpenDateResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/concerts/{concertId}/dates/{date}/seats": {
+        "get": {
+          "tags": [
+            "콘서트 일정 및 좌석"
+          ],
+          "summary": "콘서트 예약 가능 일자별 좌석 조회",
+          "operationId": "getSeats",
+          "parameters": [
+            {
+              "name": "X-Queue-Token",
+              "in": "header",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "concertId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int64"
+              }
+            },
+            {
+              "name": "date",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "*/*": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/SeatAvailabilityResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/reservations/{reservationId}/cancel": {
+        "delete": {
+          "tags": [
+            "예약"
+          ],
+          "summary": "예약 취소",
+          "operationId": "cancel",
+          "parameters": [
+            {
+              "name": "reservationId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "PaymentCompletedEvent": {
+          "type": "object",
+          "properties": {
+            "paymentId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "reservationId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "userUuid": {
+              "type": "string"
+            },
+            "concertId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "amount": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "idempotencyKey": {
+              "type": "string"
+            },
+            "occurredAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "WalletChargeRequest": {
+          "required": [
+            "amount"
+          ],
+          "type": "object",
+          "properties": {
+            "amount": {
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "WalletBalanceResponse": {
+          "type": "object",
+          "properties": {
+            "balance": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "lastUpdatedAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "ReserveSeatRequest": {
+          "type": "object",
+          "properties": {
+            "concertId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "date": {
+              "type": "string"
+            },
+            "seatNo": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "ReservationResponse": {
+          "type": "object",
+          "properties": {
+            "reservationId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "holdExpiresAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "QueueTokenRequest": {
+          "type": "object",
+          "properties": {
+            "concertId": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "QueueTokenResponse": {
+          "type": "object",
+          "properties": {
+            "queueToken": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "ISSUED",
+                "ACTIVE",
+                "EXPIRED"
+              ]
+            },
+            "rank": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "etaSeconds": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "PaymentRequest": {
+          "type": "object",
+          "properties": {
+            "reservationId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "amount": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "PaymentResponse": {
+          "type": "object",
+          "properties": {
+            "paymentId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "reservationId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "confirmed": {
+              "type": "boolean"
+            }
+          }
+        },
+        "SignupRequest": {
+          "required": [
+            "email",
+            "name",
+            "password"
+          ],
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "LoginRequest": {
+          "required": [
+            "email",
+            "password"
+          ],
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            }
+          }
+        },
+        "UserToken": {
+          "type": "object",
+          "properties": {
+            "accessToken": {
+              "type": "string"
+            },
+            "accessTokenExpiresIn": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "refreshToken": {
+              "type": "string"
+            },
+            "refreshTokenExpiresIn": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "UserResponse": {
+          "type": "object",
+          "properties": {
+            "userUuid": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "ReservationDetailResponse": {
+          "type": "object",
+          "properties": {
+            "reservationId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "concertId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "date": {
+              "type": "string"
+            },
+            "seatNo": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "status": {
+              "type": "string"
+            },
+            "paidAmount": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "holdExpiresAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "FastSoldOutConcertResponse": {
+          "type": "object",
+          "properties": {
+            "rank": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "concertId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "soldOutAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "OpenDateResponse": {
+          "type": "object",
+          "properties": {
+            "concertDateId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "concertId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "date": {
+              "type": "string",
+              "format": "date"
+            },
+            "open": {
+              "type": "boolean"
+            }
+          }
+        },
+        "SeatAvailabilityResponse": {
+          "type": "object",
+          "properties": {
+            "seatId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "seatNo": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "price": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "AVAILABLE",
+                "HELD",
+                "CONFIRMED"
+              ]
+            }
+          }
+        }
+      },
+      "securitySchemes": {
+        "Bearer Authentication": {
+          "type": "http",
+          "name": "Authorization",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      }
+    }
+  }
